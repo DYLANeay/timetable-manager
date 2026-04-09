@@ -9,6 +9,10 @@ export function fetchShifts(week: string): Promise<ApiCollection<Shift>> {
   return api<ApiCollection<Shift>>(`/shifts?week=${week}`)
 }
 
+export function fetchShiftsByMonth(month: string): Promise<ApiCollection<Shift>> {
+  return api<ApiCollection<Shift>>(`/shifts?month=${month}`)
+}
+
 export function fetchMyShifts(week: string): Promise<ApiCollection<Shift>> {
   return api<ApiCollection<Shift>>(`/shifts/my?week=${week}`)
 }

@@ -11,14 +11,21 @@ class ShiftController extends Controller
 {
     public function index(Request $request)
     {
-        $request->validate(['week' => ['required', 'date']]);
+        $request->validate([
+            'week' => ['required_without:month', 'date'],
+            'month' => ['required_without:week', 'date_format:Y-m'],
+        ]);
 
-        $shifts = Shift::with(['user', 'shiftTemplate'])
-            ->forWeek($request->week)
-            ->orderBy('date')
-            ->get();
+        $query = Shift::with(['user', 'shiftTemplate'])->orderBy('date');
 
-        return ShiftResource::collection($shifts);
+        if ($request->filled('month')) {
+            [$year, $month] = explode('-', $request->month);
+            $query->whereYear('date', $year)->whereMonth('date', $month);
+        } else {
+            $query->forWeek($request->week);
+        }
+
+        return ShiftResource::collection($query->get());
     }
 
     public function myShifts(Request $request)

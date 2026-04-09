@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PublicHolidayResource;
 use App\Models\PublicHoliday;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,7 +19,7 @@ class PublicHolidayController extends Controller
             ->orderBy('date')
             ->get();
 
-        return response()->json(['data' => $holidays]);
+        return PublicHolidayResource::collection($holidays);
     }
 
     public function store(Request $request): JsonResponse
@@ -30,7 +31,9 @@ class PublicHolidayController extends Controller
 
         $holiday = PublicHoliday::create($validated);
 
-        return response()->json(['data' => $holiday], 201);
+        return (new PublicHolidayResource($holiday))
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function destroy(PublicHoliday $publicHoliday): JsonResponse

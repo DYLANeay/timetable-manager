@@ -2,41 +2,48 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Button } from '@/components/ui/button'
+import type { ViewMode } from '@/stores/shifts'
 
 const { t, locale } = useI18n()
 
 const props = defineProps<{
   currentWeek: string
+  currentMonth: string
+  viewMode: ViewMode
 }>()
 
 const emit = defineEmits<{
   previous: []
   next: []
   today: []
+  setView: [mode: ViewMode]
 }>()
 
-const monthYear = computed(() => {
+const label = computed(() => {
   const loc = locale.value === 'fr' ? 'fr-CH' : 'en-US'
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+
+  if (props.viewMode === 'month') {
+    const [y, m] = props.currentMonth.split('-').map(Number)
+    const d = new Date(y!, m! - 1, 1)
+    return capitalize(new Intl.DateTimeFormat(loc, { month: 'long', year: 'numeric' }).format(d))
+  }
+
   const start = new Date(props.currentWeek)
   const end = new Date(start)
   end.setDate(start.getDate() + 6)
-
   const fmtMonth = new Intl.DateTimeFormat(loc, { month: 'long' })
-  const fmtYear = new Intl.DateTimeFormat(loc, { year: 'numeric' })
-
   const startMonth = fmtMonth.format(start)
   const endMonth = fmtMonth.format(end)
-  const year = fmtYear.format(end)
-
-  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-
-  if (startMonth === endMonth) {
-    return `${capitalize(startMonth)} ${year}`
-  }
+  const year = end.getFullYear()
+  if (startMonth === endMonth) return `${capitalize(startMonth)} ${year}`
   return `${capitalize(startMonth)} – ${capitalize(endMonth)} ${year}`
 })
 
-const isCurrentWeek = computed(() => {
+const isCurrentPeriod = computed(() => {
+  if (props.viewMode === 'month') {
+    return props.currentMonth === new Date().toISOString().slice(0, 7)
+  }
   const now = new Date()
   const day = now.getDay()
   const diff = now.getDate() - day + (day === 0 ? -6 : 1)
@@ -47,12 +54,30 @@ const isCurrentWeek = computed(() => {
 </script>
 
 <template>
-  <div class="flex items-center gap-2">
-    <h2 class="text-lg font-semibold tracking-tight md:text-xl">{{ monthYear }}</h2>
+  <div class="flex flex-1 items-center gap-2">
+    <h2 class="text-lg font-semibold tracking-tight md:text-xl">{{ label }}</h2>
 
     <div class="ml-auto flex items-center gap-1">
+      <!-- View toggle — desktop only -->
+      <div class="mr-1 hidden items-center gap-0.5 rounded-lg border p-0.5 md:flex">
+        <button
+          class="rounded px-2.5 py-1 text-xs font-medium transition-colors"
+          :class="viewMode === 'week' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'"
+          @click="emit('setView', 'week')"
+        >
+          {{ locale === 'fr' ? 'Semaine' : 'Week' }}
+        </button>
+        <button
+          class="rounded px-2.5 py-1 text-xs font-medium transition-colors"
+          :class="viewMode === 'month' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'"
+          @click="emit('setView', 'month')"
+        >
+          {{ locale === 'fr' ? 'Mois' : 'Month' }}
+        </button>
+      </div>
+
       <Button
-        v-if="!isCurrentWeek"
+        v-if="!isCurrentPeriod"
         variant="outline"
         size="sm"
         class="h-8 text-xs"
