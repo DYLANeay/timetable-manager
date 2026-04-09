@@ -12,17 +12,79 @@ async function handleLogout() {
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col">
-    <main class="flex-1 pb-16">
-      <slot />
-    </main>
+  <div class="flex h-screen flex-col overflow-hidden bg-background">
+    <!-- Desktop sidebar + mobile bottom nav -->
+    <!-- Desktop: left sidebar -->
+    <div class="flex h-full">
+      <aside class="hidden w-56 shrink-0 border-r bg-muted/30 md:flex md:flex-col">
+        <div class="flex h-14 items-center gap-2 border-b px-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span class="text-sm font-semibold tracking-tight">Timetable</span>
+        </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 border-t bg-background">
-      <div class="mx-auto flex h-16 max-w-md items-center justify-around">
+        <nav class="flex-1 space-y-1 p-2">
+          <RouterLink
+            to="/schedule"
+            class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+            active-class="!bg-accent !text-accent-foreground"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Schedule
+          </RouterLink>
+
+          <RouterLink
+            to="/swap-requests"
+            class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+            active-class="!bg-accent !text-accent-foreground"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            Swap Requests
+          </RouterLink>
+
+          <RouterLink
+            v-if="auth.isManager"
+            to="/employees"
+            class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+            active-class="!bg-accent !text-accent-foreground"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Employees
+          </RouterLink>
+        </nav>
+
+        <div class="border-t p-2">
+          <div class="flex items-center gap-3 rounded-md px-3 py-2">
+            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+              {{ auth.user?.name?.charAt(0)?.toUpperCase() }}
+            </div>
+            <div class="flex-1 truncate">
+              <p class="truncate text-sm font-medium">{{ auth.user?.name }}</p>
+              <p class="truncate text-xs text-muted-foreground">{{ auth.user?.role }}</p>
+            </div>
+          </div>
+          <button
+            class="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+            @click="handleLogout"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Log out
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <main class="flex-1 overflow-auto pb-16 md:pb-0">
+        <slot />
+      </main>
+    </div>
+
+    <!-- Mobile bottom nav -->
+    <nav class="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
+      <div class="mx-auto flex h-14 max-w-md items-center justify-around">
         <RouterLink
           to="/schedule"
-          class="flex flex-col items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
-          active-class="text-foreground"
+          class="flex flex-col items-center gap-0.5 text-[11px] text-muted-foreground transition-colors"
+          active-class="!text-primary"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           Schedule
@@ -30,8 +92,8 @@ async function handleLogout() {
 
         <RouterLink
           to="/swap-requests"
-          class="flex flex-col items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
-          active-class="text-foreground"
+          class="flex flex-col items-center gap-0.5 text-[11px] text-muted-foreground transition-colors"
+          active-class="!text-primary"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
           Swaps
@@ -40,15 +102,15 @@ async function handleLogout() {
         <RouterLink
           v-if="auth.isManager"
           to="/employees"
-          class="flex flex-col items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
-          active-class="text-foreground"
+          class="flex flex-col items-center gap-0.5 text-[11px] text-muted-foreground transition-colors"
+          active-class="!text-primary"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Employees
+          Team
         </RouterLink>
 
         <button
-          class="flex flex-col items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          class="flex flex-col items-center gap-0.5 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
           @click="handleLogout"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>

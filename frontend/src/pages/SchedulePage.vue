@@ -2,7 +2,6 @@
 import { onMounted, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useShiftStore } from '@/stores/shifts'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import WeekPicker from '@/components/shifts/WeekPicker.vue'
 import WeeklyTimetable from '@/components/shifts/WeeklyTimetable.vue'
 import AssignShiftDialog from '@/components/shifts/AssignShiftDialog.vue'
@@ -38,33 +37,46 @@ function handleCellClick(date: string, template: ShiftTemplate) {
 function handleSaved() {
   shiftStore.loadShifts()
 }
+
+function handleToday() {
+  const now = new Date()
+  const day = now.getDay()
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1)
+  const monday = new Date(now)
+  monday.setDate(diff)
+  shiftStore.currentWeek = monday.toISOString().split('T')[0]!
+}
 </script>
 
 <template>
-  <div class="space-y-4 p-4">
-    <Card>
-      <CardHeader class="pb-3">
-        <CardTitle class="text-lg">Weekly Schedule</CardTitle>
-        <WeekPicker
-          :current-week="shiftStore.currentWeek"
-          @previous="shiftStore.previousWeek()"
-          @next="shiftStore.nextWeek()"
-        />
-      </CardHeader>
-      <CardContent>
-        <div v-if="shiftStore.loading" class="flex justify-center py-8">
-          <span class="text-sm text-muted-foreground">Loading...</span>
+  <div class="flex h-full flex-col">
+    <!-- Top bar -->
+    <header class="flex shrink-0 items-center border-b px-4 py-3 md:px-6">
+      <WeekPicker
+        :current-week="shiftStore.currentWeek"
+        @previous="shiftStore.previousWeek()"
+        @next="shiftStore.nextWeek()"
+        @today="handleToday"
+      />
+    </header>
+
+    <!-- Timetable -->
+    <div class="flex-1 overflow-auto">
+      <div v-if="shiftStore.loading" class="flex h-full items-center justify-center">
+        <div class="flex flex-col items-center gap-2">
+          <div class="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <span class="text-sm text-muted-foreground">Loading schedule...</span>
         </div>
-        <WeeklyTimetable
-          v-else
-          :week-days="shiftStore.weekDays"
-          :templates="shiftStore.templates"
-          :shifts="shiftStore.shifts"
-          :is-manager="auth.isManager"
-          @cell-click="handleCellClick"
-        />
-      </CardContent>
-    </Card>
+      </div>
+      <WeeklyTimetable
+        v-else
+        :week-days="shiftStore.weekDays"
+        :templates="shiftStore.templates"
+        :shifts="shiftStore.shifts"
+        :is-manager="auth.isManager"
+        @cell-click="handleCellClick"
+      />
+    </div>
   </div>
 
   <AssignShiftDialog
