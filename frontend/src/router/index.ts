@@ -17,6 +17,18 @@ const router = createRouter({
       meta: { auth: true },
     },
     {
+      path: '/swap-requests',
+      name: 'swap-requests',
+      component: () => import('@/pages/SwapRequestsPage.vue'),
+      meta: { auth: true },
+    },
+    {
+      path: '/employees',
+      name: 'employees',
+      component: () => import('@/pages/EmployeesPage.vue'),
+      meta: { auth: true, manager: true },
+    },
+    {
       path: '/',
       redirect: '/schedule',
     },
@@ -35,6 +47,10 @@ router.beforeEach(async (to) => {
   }
 
   if (to.meta.guest && auth.isAuthenticated) {
+    return { name: 'schedule' }
+  }
+
+  if (to.meta.manager && !auth.isManager) {
     return { name: 'schedule' }
   }
 })
