@@ -13,17 +13,15 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Manager',
-            'email' => 'manager@station.com',
-            'role' => Role::Manager,
-        ]);
+        User::firstOrCreate(
+            ['email' => 'manager@station.com'],
+            ['name' => 'Manager', 'role' => Role::Manager, 'password' => bcrypt('password')],
+        );
 
-        User::factory()->create([
-            'name' => 'Employee',
-            'email' => 'employee@station.com',
-            'role' => Role::Employee,
-        ]);
+        User::firstOrCreate(
+            ['email' => 'employee@station.com'],
+            ['name' => 'Employee', 'role' => Role::Employee, 'password' => bcrypt('password')],
+        );
 
         $this->call(ShiftTemplateSeeder::class);
     }
