@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useShiftStore } from '@/stores/shifts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import WeekPicker from '@/components/shifts/WeekPicker.vue'
 import WeeklyTimetable from '@/components/shifts/WeeklyTimetable.vue'
-import type { ShiftTemplate } from '@/types'
+import AssignShiftDialog from '@/components/shifts/AssignShiftDialog.vue'
+import type { Shift, ShiftTemplate } from '@/types'
 
 const auth = useAuthStore()
 const shiftStore = useShiftStore()
+
+const dialogOpen = ref(false)
+const selectedDate = ref('')
+const selectedTemplate = ref<ShiftTemplate | null>(null)
+const selectedShift = ref<Shift | undefined>(undefined)
 
 onMounted(async () => {
   await shiftStore.loadTemplates()
@@ -20,8 +26,17 @@ watch(() => shiftStore.currentWeek, () => {
 })
 
 function handleCellClick(date: string, template: ShiftTemplate) {
-  // TODO: Open assignment dialog for managers
-  console.log('Cell clicked:', date, template)
+  selectedDate.value = date
+  selectedTemplate.value = template
+
+  const existing = shiftStore.getShiftsForDateAndTemplate(date, template.id)
+  selectedShift.value = existing[0]
+
+  dialogOpen.value = true
+}
+
+function handleSaved() {
+  shiftStore.loadShifts()
 }
 </script>
 
@@ -51,4 +66,14 @@ function handleCellClick(date: string, template: ShiftTemplate) {
       </CardContent>
     </Card>
   </div>
+
+  <AssignShiftDialog
+    v-if="dialogOpen && selectedTemplate"
+    :open="dialogOpen"
+    :date="selectedDate"
+    :template="selectedTemplate"
+    :existing-shift="selectedShift"
+    @update:open="dialogOpen = $event"
+    @saved="handleSaved"
+  />
 </template>
