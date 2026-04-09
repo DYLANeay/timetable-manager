@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { ApiError } from '@/api/client'
 
+const { t } = useI18n()
 const auth = useAuthStore()
 const router = useRouter()
 
@@ -21,9 +23,9 @@ async function handleLogin() {
   } catch (e) {
     if (e instanceof ApiError) {
       const messages = (e.data as { errors?: Record<string, string[]> }).errors
-      error.value = messages ? Object.values(messages).flat().join(' ') : 'Login failed'
+      error.value = messages ? Object.values(messages).flat().join(' ') : t('auth.loginFailed')
     } else {
-      error.value = 'An unexpected error occurred'
+      error.value = t('auth.unexpectedError')
     }
   } finally {
     loading.value = false
@@ -35,8 +37,8 @@ async function handleLogin() {
   <div class="flex min-h-screen items-center justify-center bg-background px-4">
     <div class="w-full max-w-sm space-y-6">
       <div class="text-center">
-        <h1 class="text-2xl font-bold tracking-tight">Timetable Manager</h1>
-        <p class="mt-2 text-sm text-muted-foreground">Sign in to your account</p>
+        <h1 class="text-2xl font-bold tracking-tight">{{ $t('auth.title') }}</h1>
+        <p class="mt-2 text-sm text-muted-foreground">{{ $t('auth.subtitle') }}</p>
       </div>
 
       <form class="space-y-4" @submit.prevent="handleLogin">
@@ -45,7 +47,7 @@ async function handleLogin() {
         </div>
 
         <div class="space-y-2">
-          <label for="email" class="text-sm font-medium">Email</label>
+          <label for="email" class="text-sm font-medium">{{ $t('auth.email') }}</label>
           <input
             id="email"
             v-model="email"
@@ -58,7 +60,7 @@ async function handleLogin() {
         </div>
 
         <div class="space-y-2">
-          <label for="password" class="text-sm font-medium">Password</label>
+          <label for="password" class="text-sm font-medium">{{ $t('auth.password') }}</label>
           <input
             id="password"
             v-model="password"
@@ -75,7 +77,7 @@ async function handleLogin() {
           :disabled="loading"
           class="inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
         >
-          {{ loading ? 'Signing in...' : 'Sign in' }}
+          {{ loading ? $t('auth.signingIn') : $t('auth.signIn') }}
         </button>
       </form>
     </div>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,8 @@ import {
 import { fetchEmployees } from '@/api/employees'
 import { createShift, updateShift, deleteShift } from '@/api/shifts'
 import type { Shift, ShiftTemplate, User } from '@/types'
+
+const { t, locale } = useI18n()
 
 const props = defineProps<{
   open: boolean
@@ -44,11 +47,18 @@ onMounted(async () => {
   }
 })
 
-const dateLabel = new Intl.DateTimeFormat('fr-CH', {
-  weekday: 'long',
-  day: 'numeric',
-  month: 'long',
-}).format(new Date(props.date))
+const dateLabel = computed(() => {
+  const loc = locale.value === 'fr' ? 'fr-CH' : 'en-US'
+  return new Intl.DateTimeFormat(loc, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  }).format(new Date(props.date))
+})
+
+const shiftTypeLabel = computed(() =>
+  props.template.shift_type === 'morning' ? t('schedule.morning') : t('schedule.afternoon')
+)
 
 async function handleSave() {
   loading.value = true
@@ -87,19 +97,19 @@ async function handleRemove() {
   <Dialog :open="open" @update:open="emit('update:open', $event)">
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle>Assign Shift</DialogTitle>
+        <DialogTitle>{{ $t('schedule.assignShift') }}</DialogTitle>
         <DialogDescription>
-          {{ dateLabel }} — {{ template.shift_type === 'morning' ? 'Morning' : 'Afternoon' }}
+          {{ dateLabel }} — {{ shiftTypeLabel }}
           ({{ template.start_time.slice(0, 5) }}–{{ template.end_time.slice(0, 5) }})
         </DialogDescription>
       </DialogHeader>
 
       <div class="space-y-4 py-4">
         <div class="space-y-2">
-          <label class="text-sm font-medium">Employee</label>
+          <label class="text-sm font-medium">{{ $t('schedule.employee') }}</label>
           <Select v-model="selectedUserId">
             <SelectTrigger>
-              <SelectValue placeholder="Select an employee" />
+              <SelectValue :placeholder="$t('schedule.selectEmployee')" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem
@@ -121,10 +131,10 @@ async function handleRemove() {
           :disabled="loading"
           @click="handleRemove"
         >
-          Remove
+          {{ $t('schedule.remove') }}
         </Button>
         <Button :disabled="loading" @click="handleSave">
-          {{ loading ? 'Saving...' : existingShift ? 'Update' : 'Assign' }}
+          {{ loading ? $t('schedule.saving') : existingShift ? $t('common.update') : $t('schedule.assign') }}
         </Button>
       </DialogFooter>
     </DialogContent>

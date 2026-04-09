@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -73,14 +73,14 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="space-y-4 p-4">
+  <div class="space-y-4 p-4 md:p-6">
     <div class="flex items-center justify-between">
-      <h1 class="text-xl font-bold">Employees</h1>
-      <Button size="sm" @click="openCreate">Add Employee</Button>
+      <h1 class="text-xl font-bold">{{ $t('employees.title') }}</h1>
+      <Button size="sm" @click="openCreate">{{ $t('employees.addEmployee') }}</Button>
     </div>
 
     <div v-if="loading" class="flex justify-center py-8">
-      <span class="text-sm text-muted-foreground">Loading...</span>
+      <span class="text-sm text-muted-foreground">{{ $t('common.loading') }}</span>
     </div>
 
     <div v-else class="space-y-3">
@@ -92,11 +92,11 @@ onMounted(load)
           </div>
           <div class="flex items-center gap-2">
             <Badge :variant="emp.role === 'manager' ? 'default' : 'secondary'">
-              {{ emp.role }}
+              {{ emp.role === 'manager' ? $t('employees.roleManager') : $t('employees.roleEmployee') }}
             </Badge>
-            <Button size="sm" variant="outline" @click="openEdit(emp)">Edit</Button>
+            <Button size="sm" variant="outline" @click="openEdit(emp)">{{ $t('common.edit') }}</Button>
             <Button size="sm" variant="destructive" @click="handleDeactivate(emp)">
-              Deactivate
+              {{ $t('employees.deactivate') }}
             </Button>
           </div>
         </CardContent>
@@ -107,15 +107,15 @@ onMounted(load)
   <Dialog v-model:open="dialogOpen">
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle>{{ editingEmployee ? 'Edit Employee' : 'Add Employee' }}</DialogTitle>
+        <DialogTitle>{{ editingEmployee ? $t('employees.editEmployee') : $t('employees.createEmployee') }}</DialogTitle>
         <DialogDescription>
-          {{ editingEmployee ? 'Update employee details.' : 'Create a new employee account.' }}
+          {{ editingEmployee ? $t('employees.editDescription') : $t('employees.createDescription') }}
         </DialogDescription>
       </DialogHeader>
 
       <form class="space-y-4 py-4" @submit.prevent="handleSave">
         <div class="space-y-2">
-          <label class="text-sm font-medium">Name</label>
+          <label class="text-sm font-medium">{{ $t('employees.name') }}</label>
           <input
             v-model="form.name"
             required
@@ -124,7 +124,7 @@ onMounted(load)
         </div>
 
         <div class="space-y-2">
-          <label class="text-sm font-medium">Email</label>
+          <label class="text-sm font-medium">{{ $t('employees.email') }}</label>
           <input
             v-model="form.email"
             type="email"
@@ -135,7 +135,7 @@ onMounted(load)
 
         <div class="space-y-2">
           <label class="text-sm font-medium">
-            Password {{ editingEmployee ? '(leave empty to keep current)' : '' }}
+            {{ $t('employees.password') }} {{ editingEmployee ? $t('employees.passwordKeep') : '' }}
           </label>
           <input
             v-model="form.password"
@@ -147,19 +147,19 @@ onMounted(load)
         </div>
 
         <div class="space-y-2">
-          <label class="text-sm font-medium">Role</label>
+          <label class="text-sm font-medium">{{ $t('employees.role') }}</label>
           <select
             v-model="form.role"
             class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <option value="employee">Employee</option>
-            <option value="manager">Manager</option>
+            <option value="employee">{{ $t('employees.roleEmployee') }}</option>
+            <option value="manager">{{ $t('employees.roleManager') }}</option>
           </select>
         </div>
 
         <DialogFooter>
           <Button type="submit">
-            {{ editingEmployee ? 'Update' : 'Create' }}
+            {{ editingEmployee ? $t('common.update') : $t('common.create') }}
           </Button>
         </DialogFooter>
       </form>

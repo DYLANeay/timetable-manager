@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Button } from '@/components/ui/button'
+
+const { t, locale } = useI18n()
 
 const props = defineProps<{
   currentWeek: string
@@ -13,21 +16,24 @@ const emit = defineEmits<{
 }>()
 
 const monthYear = computed(() => {
+  const loc = locale.value === 'fr' ? 'fr-CH' : 'en-US'
   const start = new Date(props.currentWeek)
   const end = new Date(start)
   end.setDate(start.getDate() + 6)
 
-  const fmtMonth = new Intl.DateTimeFormat('en-US', { month: 'long' })
-  const fmtYear = new Intl.DateTimeFormat('en-US', { year: 'numeric' })
+  const fmtMonth = new Intl.DateTimeFormat(loc, { month: 'long' })
+  const fmtYear = new Intl.DateTimeFormat(loc, { year: 'numeric' })
 
   const startMonth = fmtMonth.format(start)
   const endMonth = fmtMonth.format(end)
   const year = fmtYear.format(end)
 
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+
   if (startMonth === endMonth) {
-    return `${startMonth} ${year}`
+    return `${capitalize(startMonth)} ${year}`
   }
-  return `${startMonth} – ${endMonth} ${year}`
+  return `${capitalize(startMonth)} – ${capitalize(endMonth)} ${year}`
 })
 
 const isCurrentWeek = computed(() => {
@@ -52,7 +58,7 @@ const isCurrentWeek = computed(() => {
         class="h-8 text-xs"
         @click="emit('today')"
       >
-        Today
+        {{ t('common.today') }}
       </Button>
 
       <Button variant="ghost" size="icon" class="h-8 w-8" @click="emit('previous')">

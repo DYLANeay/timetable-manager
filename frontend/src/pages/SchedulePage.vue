@@ -65,7 +65,7 @@ function handleToday() {
       <div v-if="shiftStore.loading" class="flex h-full items-center justify-center">
         <div class="flex flex-col items-center gap-2">
           <div class="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <span class="text-sm text-muted-foreground">Loading schedule...</span>
+          <span class="text-sm text-muted-foreground">{{ $t('schedule.loadingSchedule') }}</span>
         </div>
       </div>
       <WeeklyTimetable

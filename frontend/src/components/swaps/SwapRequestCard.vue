@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -10,6 +11,8 @@ import {
   cancelSwapRequest,
   type SwapRequestData,
 } from '@/api/swaps'
+
+const { t, locale } = useI18n()
 
 const props = defineProps<{
   request: SwapRequestData
@@ -22,15 +25,6 @@ const emit = defineEmits<{
 const auth = useAuthStore()
 const loading = ref(false)
 
-const statusLabels: Record<string, string> = {
-  pending_peer: 'Pending Peer',
-  peer_accepted: 'Peer Accepted',
-  peer_declined: 'Peer Declined',
-  manager_approved: 'Approved',
-  manager_denied: 'Denied',
-  cancelled: 'Cancelled',
-}
-
 const statusVariants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
   pending_peer: 'secondary',
   peer_accepted: 'outline',
@@ -41,12 +35,13 @@ const statusVariants: Record<string, 'default' | 'secondary' | 'destructive' | '
 }
 
 function formatShift(shift: SwapRequestData['requester_shift']): string {
-  const date = new Intl.DateTimeFormat('fr-CH', {
+  const loc = locale.value === 'fr' ? 'fr-CH' : 'en-US'
+  const date = new Intl.DateTimeFormat(loc, {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
   }).format(new Date(shift.date))
-  const type = shift.shift_template.shift_type === 'morning' ? 'Morning' : 'Afternoon'
+  const type = shift.shift_template.shift_type === 'morning' ? t('schedule.morning') : t('schedule.afternoon')
   return `${date} — ${type}`
 }
 
@@ -89,6 +84,8 @@ async function handleCancel() {
     loading.value = false
   }
 }
+
+const statusKey = computed(() => `swaps.status.${props.request.status}`)
 </script>
 
 <template>
@@ -99,7 +96,7 @@ async function handleCancel() {
           {{ request.requester.name }} ↔ {{ request.target.name }}
         </CardTitle>
         <Badge :variant="statusVariants[request.status] ?? 'secondary'">
-          {{ statusLabels[request.status] ?? request.status }}
+          {{ t(statusKey) }}
         </Badge>
       </div>
     </CardHeader>
@@ -122,24 +119,24 @@ async function handleCancel() {
       <div class="flex gap-2 pt-2">
         <template v-if="canPeerRespond">
           <Button size="sm" :disabled="loading" @click="handleRespond(true)">
-            Accept
+            {{ $t('swaps.accept') }}
           </Button>
           <Button size="sm" variant="outline" :disabled="loading" @click="handleRespond(false)">
-            Decline
+            {{ $t('swaps.decline') }}
           </Button>
         </template>
 
         <template v-if="canManagerDecide">
           <Button size="sm" :disabled="loading" @click="handleDecide(true)">
-            Approve
+            {{ $t('swaps.approve') }}
           </Button>
           <Button size="sm" variant="outline" :disabled="loading" @click="handleDecide(false)">
-            Deny
+            {{ $t('swaps.deny') }}
           </Button>
         </template>
 
         <Button v-if="canCancel" size="sm" variant="destructive" :disabled="loading" @click="handleCancel">
-          Cancel
+          {{ $t('swaps.cancel') }}
         </Button>
       </div>
     </CardContent>

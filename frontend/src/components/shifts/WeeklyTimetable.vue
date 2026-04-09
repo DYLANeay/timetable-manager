@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Shift, ShiftTemplate } from '@/types'
+
+const { t, locale } = useI18n()
 
 const props = defineProps<{
   weekDays: string[]
@@ -16,14 +19,15 @@ const emit = defineEmits<{
 const today = new Date().toISOString().split('T')[0]
 
 const dayColumns = computed(() => {
-  const weekdayFmt = new Intl.DateTimeFormat('en-US', { weekday: 'short' })
-  const dayFmt = new Intl.DateTimeFormat('en-US', { day: 'numeric' })
+  const loc = locale.value === 'fr' ? 'fr-CH' : 'en-US'
+  const weekdayFmt = new Intl.DateTimeFormat(loc, { weekday: 'short' })
+  const dayFmt = new Intl.DateTimeFormat(loc, { day: 'numeric' })
 
   return props.weekDays.map((d) => {
     const date = new Date(d)
     return {
       date: d,
-      weekday: weekdayFmt.format(date).toUpperCase(),
+      weekday: weekdayFmt.format(date).replace('.', '').toUpperCase(),
       day: dayFmt.format(date),
       isSunday: date.getDay() === 0,
       isSaturday: date.getDay() === 6,
@@ -101,7 +105,7 @@ function getInitials(name: string): string {
       <div class="relative border-b">
         <div class="absolute -top-0 left-0 z-10 -translate-y-1/2 px-2">
           <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-            Morning
+            {{ t('schedule.morning') }}
           </span>
         </div>
         <div class="grid grid-cols-7 pt-3">
@@ -115,12 +119,10 @@ function getInitials(name: string): string {
             ]"
             @click="handleCellClick(col.date, 'morning')"
           >
-            <!-- Time label -->
             <div class="mb-1.5 text-[10px] text-muted-foreground/60">
               {{ formatTime(getTemplate(col.date, 'morning')?.start_time ?? '') }}–{{ formatTime(getTemplate(col.date, 'morning')?.end_time ?? '') }}
             </div>
 
-            <!-- Shift blocks -->
             <div class="space-y-1">
               <div
                 v-for="shift in getShiftsForCell(col.date, 'morning')"
@@ -131,12 +133,11 @@ function getInitials(name: string): string {
                   {{ getInitials(shift.user?.name ?? '?') }}
                 </div>
                 <span class="truncate text-xs font-medium text-blue-900 dark:text-blue-200">
-                  {{ shift.user?.name ?? 'Unassigned' }}
+                  {{ shift.user?.name ?? t('schedule.unassigned') }}
                 </span>
               </div>
             </div>
 
-            <!-- Empty state -->
             <div
               v-if="getShiftsForCell(col.date, 'morning').length === 0 && isManager"
               class="flex h-14 items-center justify-center rounded-md border border-dashed border-border/40 opacity-0 transition-opacity hover:opacity-100"
@@ -151,7 +152,7 @@ function getInitials(name: string): string {
       <div class="relative">
         <div class="absolute -top-0 left-0 z-10 -translate-y-1/2 px-2">
           <span class="rounded-full bg-violet-100 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">
-            Afternoon
+            {{ t('schedule.afternoon') }}
           </span>
         </div>
         <div class="grid grid-cols-7 pt-3">
@@ -165,12 +166,10 @@ function getInitials(name: string): string {
             ]"
             @click="handleCellClick(col.date, 'afternoon')"
           >
-            <!-- Time label -->
             <div class="mb-1.5 text-[10px] text-muted-foreground/60">
               {{ formatTime(getTemplate(col.date, 'afternoon')?.start_time ?? '') }}–{{ formatTime(getTemplate(col.date, 'afternoon')?.end_time ?? '') }}
             </div>
 
-            <!-- Shift blocks -->
             <div class="space-y-1">
               <div
                 v-for="shift in getShiftsForCell(col.date, 'afternoon')"
@@ -181,12 +180,11 @@ function getInitials(name: string): string {
                   {{ getInitials(shift.user?.name ?? '?') }}
                 </div>
                 <span class="truncate text-xs font-medium text-violet-900 dark:text-violet-200">
-                  {{ shift.user?.name ?? 'Unassigned' }}
+                  {{ shift.user?.name ?? t('schedule.unassigned') }}
                 </span>
               </div>
             </div>
 
-            <!-- Empty state -->
             <div
               v-if="getShiftsForCell(col.date, 'afternoon').length === 0 && isManager"
               class="flex h-14 items-center justify-center rounded-md border border-dashed border-border/40 opacity-0 transition-opacity hover:opacity-100"

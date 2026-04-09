@@ -20,15 +20,15 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="space-y-4 p-4">
-    <h1 class="text-xl font-bold">Swap Requests</h1>
+  <div class="space-y-4 p-4 md:p-6">
+    <h1 class="text-xl font-bold">{{ $t('swaps.title') }}</h1>
 
     <div v-if="loading" class="flex justify-center py-8">
-      <span class="text-sm text-muted-foreground">Loading...</span>
+      <span class="text-sm text-muted-foreground">{{ $t('common.loading') }}</span>
     </div>
 
     <div v-else-if="requests.length === 0" class="py-8 text-center text-sm text-muted-foreground">
-      No swap requests yet.
+      {{ $t('swaps.noRequests') }}
     </div>
 
     <div v-else class="space-y-3">
