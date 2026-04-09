@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Shift, ShiftTemplate } from '@/types'
 import type { PublicHoliday } from '@/api/holidays'
@@ -24,6 +24,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   cellClick: [date: string, template: ShiftTemplate]
+  jumpToWeek: [mondayDate: string, targetDate: string]
 }>()
 
 const now = new Date()
@@ -71,13 +72,44 @@ const canGoForward = computed(() => mobileStartIndex.value + 3 < props.weekDays.
 // Date jump
 const showDatePicker = ref(false)
 const jumpDate = ref(today)
+const pendingJumpDate = ref<string | null>(null)
+
+// After weekDays changes (week navigation), jump to the pending target date
+watch(() => props.weekDays, (newDays) => {
+  if (pendingJumpDate.value) {
+    const idx = newDays.indexOf(pendingJumpDate.value)
+    if (idx !== -1) {
+      mobileStartIndex.value = Math.min(idx, newDays.length - 3)
+    }
+    pendingJumpDate.value = null
+  } else {
+    mobileStartIndex.value = 0
+  }
+})
+
+function getMonday(dateStr: string): string {
+  const d = parseLocal(dateStr)
+  const day = d.getDay()
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+  const mon = new Date(d.getFullYear(), d.getMonth(), diff)
+  const y = mon.getFullYear()
+  const m = String(mon.getMonth() + 1).padStart(2, '0')
+  const dd = String(mon.getDate()).padStart(2, '0')
+  return `${y}-${m}-${dd}`
+}
 
 function jumpToDate() {
+  showDatePicker.value = false
   const idx = props.weekDays.indexOf(jumpDate.value)
   if (idx !== -1) {
+    // Date is in the current week
     mobileStartIndex.value = Math.min(idx, props.weekDays.length - 3)
+  } else {
+    // Navigate to the week containing the chosen date
+    const monday = getMonday(jumpDate.value)
+    pendingJumpDate.value = jumpDate.value
+    emit('jumpToWeek', monday, jumpDate.value)
   }
-  showDatePicker.value = false
 }
 
 function getTemplate(date: string, shiftType: 'morning' | 'afternoon'): ShiftTemplate | undefined {

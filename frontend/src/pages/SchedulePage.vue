@@ -38,6 +38,10 @@ function handleSaved() {
   shiftStore.load()
 }
 
+function handleJumpToWeek(monday: string) {
+  shiftStore.currentWeek = monday
+}
+
 function handleToday() {
   const now = new Date()
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -111,6 +115,7 @@ function printSchedule() {
           :leave-requests="shiftStore.leaveRequests"
           :is-manager="auth.isManager"
           @cell-click="handleCellClick"
+          @jump-to-week="handleJumpToWeek"
         />
         <MonthlyTimetable
           v-else
