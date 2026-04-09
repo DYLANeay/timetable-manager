@@ -71,7 +71,11 @@ function toggleLocale() {
           </button>
 
           <!-- User info -->
-          <div class="flex items-center gap-3 rounded-md px-3 py-2">
+          <RouterLink
+            to="/profile"
+            class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors hover:bg-accent"
+            active-class="!bg-accent"
+          >
             <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
               {{ auth.user?.name?.charAt(0)?.toUpperCase() }}
             </div>
@@ -79,7 +83,7 @@ function toggleLocale() {
               <p class="truncate text-sm font-medium">{{ auth.user?.name }}</p>
               <p class="truncate text-xs text-muted-foreground">{{ auth.user?.role }}</p>
             </div>
-          </div>
+          </RouterLink>
 
           <button
             class="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"

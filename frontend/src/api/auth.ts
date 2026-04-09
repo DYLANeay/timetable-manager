@@ -15,3 +15,14 @@ export function logout(): Promise<void> {
 export function fetchMe(): Promise<User> {
   return api<User>('/auth/me')
 }
+
+export function changePassword(data: {
+  current_password: string
+  password: string
+  password_confirmation: string
+}): Promise<void> {
+  return api('/auth/password', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}

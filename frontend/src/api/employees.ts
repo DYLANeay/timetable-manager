@@ -12,7 +12,6 @@ export function fetchEmployees(): Promise<ApiCollection<User>> {
 export function createEmployee(data: {
   name: string
   email: string
-  password: string
   role: string
 }): Promise<{ data: User }> {
   return api('/employees', {
@@ -23,7 +22,7 @@ export function createEmployee(data: {
 
 export function updateEmployee(
   id: number,
-  data: Partial<{ name: string; email: string; password: string; role: string; is_active: boolean }>,
+  data: Partial<{ name: string; email: string; role: string; is_active: boolean }>,
 ): Promise<{ data: User }> {
   return api(`/employees/${id}`, {
     method: 'PUT',

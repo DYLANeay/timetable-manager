@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\Role;
+use App\Mail\EmployeeInvitation;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class EmployeeController extends Controller
 {
@@ -23,11 +25,17 @@ class EmployeeController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8'],
             'role' => ['required', 'in:employee,manager'],
         ]);
 
-        $user = User::create($validated);
+        $temporaryPassword = Str::password(12, symbols: false);
+
+        $user = User::create([
+            ...$validated,
+            'password' => $temporaryPassword,
+        ]);
+
+        Mail::to($user->email)->send(new EmployeeInvitation($user, $temporaryPassword));
 
         return response()->json(['data' => $user], 201);
     }
@@ -37,7 +45,6 @@ class EmployeeController extends Controller
         $validated = $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'email', 'unique:users,email,' . $employee->id],
-            'password' => ['sometimes', 'string', 'min:8'],
             'role' => ['sometimes', 'in:employee,manager'],
             'is_active' => ['sometimes', 'boolean'],
         ]);

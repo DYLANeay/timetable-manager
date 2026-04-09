@@ -19,12 +19,7 @@ const loading = ref(true)
 const dialogOpen = ref(false)
 const editingEmployee = ref<User | null>(null)
 
-const form = ref({
-  name: '',
-  email: '',
-  password: '',
-  role: 'employee',
-})
+const form = ref({ name: '', email: '', role: 'employee' })
 
 async function load() {
   loading.value = true
@@ -38,25 +33,23 @@ async function load() {
 
 function openCreate() {
   editingEmployee.value = null
-  form.value = { name: '', email: '', password: '', role: 'employee' }
+  form.value = { name: '', email: '', role: 'employee' }
   dialogOpen.value = true
 }
 
 function openEdit(employee: User) {
   editingEmployee.value = employee
-  form.value = { name: employee.name, email: employee.email, password: '', role: employee.role }
+  form.value = { name: employee.name, email: employee.email, role: employee.role }
   dialogOpen.value = true
 }
 
 async function handleSave() {
   if (editingEmployee.value) {
-    const data: Record<string, string> = {
+    await updateEmployee(editingEmployee.value.id, {
       name: form.value.name,
       email: form.value.email,
       role: form.value.role,
-    }
-    if (form.value.password) data.password = form.value.password
-    await updateEmployee(editingEmployee.value.id, data)
+    })
   } else {
     await createEmployee(form.value)
   }
@@ -129,19 +122,6 @@ onMounted(load)
             v-model="form.email"
             type="email"
             required
-            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-sm font-medium">
-            {{ $t('employees.password') }} {{ editingEmployee ? $t('employees.passwordKeep') : '' }}
-          </label>
-          <input
-            v-model="form.password"
-            type="password"
-            :required="!editingEmployee"
-            minlength="8"
             class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
         </div>
