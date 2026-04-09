@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PublicHolidayController;
+use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\ShiftTemplateController;
 use App\Http\Controllers\SwapRequestController;
@@ -23,6 +24,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/shifts', [ShiftController::class, 'index']);
     Route::get('/shifts/my', [ShiftController::class, 'myShifts']);
 
+    Route::get('/leave-requests', [LeaveRequestController::class, 'index']);
+    Route::post('/leave-requests', [LeaveRequestController::class, 'store']);
+    Route::delete('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'cancel']);
+    Route::get('/leave-requests/balance', [LeaveRequestController::class, 'balance']);
+
     Route::get('/swap-requests', [SwapRequestController::class, 'index']);
     Route::post('/swap-requests', [SwapRequestController::class, 'store']);
     Route::put('/swap-requests/{swapRequest}/respond', [SwapRequestController::class, 'respond']);
@@ -34,6 +40,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/shifts/{shift}', [ShiftController::class, 'update']);
         Route::delete('/shifts/{shift}', [ShiftController::class, 'destroy']);
         Route::post('/shifts/bulk', [ShiftController::class, 'bulk']);
+
+        Route::put('/leave-requests/{leaveRequest}/decide', [LeaveRequestController::class, 'decide']);
 
         Route::post('/public-holidays', [PublicHolidayController::class, 'store']);
         Route::delete('/public-holidays/{publicHoliday}', [PublicHolidayController::class, 'destroy']);

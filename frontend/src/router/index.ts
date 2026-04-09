@@ -23,6 +23,12 @@ const router = createRouter({
       meta: { auth: true },
     },
     {
+      path: '/leaves',
+      name: 'leaves',
+      component: () => import('@/pages/LeavesPage.vue'),
+      meta: { auth: true },
+    },
+    {
       path: '/employees',
       name: 'employees',
       component: () => import('@/pages/EmployeesPage.vue'),

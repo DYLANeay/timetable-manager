@@ -108,6 +108,7 @@ function printSchedule() {
           :templates="shiftStore.templates"
           :shifts="shiftStore.shifts"
           :holidays="shiftStore.holidays"
+          :leave-requests="shiftStore.leaveRequests"
           :is-manager="auth.isManager"
           @cell-click="handleCellClick"
         />
@@ -118,6 +119,7 @@ function printSchedule() {
           :templates="shiftStore.templates"
           :shifts="shiftStore.shifts"
           :holidays="shiftStore.holidays"
+          :leave-requests="shiftStore.leaveRequests"
           :is-manager="auth.isManager"
           @cell-click="handleCellClick"
         />

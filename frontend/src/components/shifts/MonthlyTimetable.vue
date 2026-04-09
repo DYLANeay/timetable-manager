@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Shift, ShiftTemplate } from '@/types'
 import type { PublicHoliday } from '@/api/holidays'
+import type { LeaveRequest } from '@/api/leaves'
 
 const { t, locale } = useI18n()
 
@@ -12,6 +13,7 @@ const props = defineProps<{
   templates: ShiftTemplate[]
   shifts: Shift[]
   holidays: PublicHoliday[]
+  leaveRequests: LeaveRequest[]
   isManager: boolean
 }>()
 
@@ -74,6 +76,12 @@ function getShiftsForCell(date: string, shiftType: 'morning' | 'afternoon'): Shi
   if (!template) return []
   return props.shifts.filter(
     (s) => s.date === date && s.shift_template.id === template.id,
+  )
+}
+
+function getLeavesForDate(date: string): LeaveRequest[] {
+  return props.leaveRequests.filter(
+    (l) => l.status === 'approved' && l.start_date <= date && l.end_date >= date,
   )
 }
 
@@ -163,6 +171,17 @@ function handleClick(date: string, shiftType: 'morning' | 'afternoon') {
               {{ getInitials(shift.user?.name ?? '?') }}
             </div>
             <span class="truncate text-[10px] font-medium text-violet-900 dark:text-violet-200">{{ shift.user?.name }}</span>
+          </div>
+
+          <div
+            v-for="leave in getLeavesForDate(col.date)"
+            :key="`l-${leave.id}`"
+            class="flex items-center gap-1 rounded bg-orange-100 px-1.5 py-0.5 dark:bg-orange-950/40"
+          >
+            <div class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-orange-500 text-[8px] font-bold text-white">
+              {{ getInitials(leave.user.name) }}
+            </div>
+            <span class="truncate text-[10px] font-medium text-orange-900 dark:text-orange-200">{{ leave.user.name }}</span>
           </div>
 
           <div

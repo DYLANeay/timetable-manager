@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import type { Shift, ShiftTemplate } from '@/types'
 import * as shiftsApi from '@/api/shifts'
 import { fetchHolidays, type PublicHoliday } from '@/api/holidays'
+import { fetchLeaveRequests, type LeaveRequest } from '@/api/leaves'
 
 export type ViewMode = 'week' | 'month'
 
@@ -37,6 +38,7 @@ export const useShiftStore = defineStore('shifts', () => {
   const shifts = ref<Shift[]>([])
   const templates = ref<ShiftTemplate[]>([])
   const holidays = ref<PublicHoliday[]>([])
+  const leaveRequests = ref<LeaveRequest[]>([])
   const currentWeek = ref(getMonday(new Date()))
   const currentMonth = ref(toLocalMonth(new Date()))
   const viewMode = ref<ViewMode>('week')
@@ -100,6 +102,20 @@ export const useShiftStore = defineStore('shifts', () => {
     templates.value = response.data
   }
 
+  async function loadLeaves() {
+    const year = viewMode.value === 'month'
+      ? Number(currentMonth.value.slice(0, 4))
+      : parseLocalDate(currentWeek.value).getFullYear()
+    const res = await fetchLeaveRequests(year)
+    leaveRequests.value = res.data
+  }
+
+  function getLeavesForDate(date: string): LeaveRequest[] {
+    return leaveRequests.value.filter(
+      (l) => l.status === 'approved' && l.start_date <= date && l.end_date >= date,
+    )
+  }
+
   async function loadHolidays() {
     const year = viewMode.value === 'month'
       ? Number(currentMonth.value.slice(0, 4))
@@ -124,7 +140,7 @@ export const useShiftStore = defineStore('shifts', () => {
   }
 
   async function load() {
-    await Promise.all([loadShifts(), loadHolidays()])
+    await Promise.all([loadShifts(), loadHolidays(), loadLeaves()])
   }
 
   function previousWeek() {
@@ -161,10 +177,10 @@ export const useShiftStore = defineStore('shifts', () => {
   }
 
   return {
-    shifts, templates, holidays, currentWeek, currentMonth, viewMode, loading,
-    weekDays, monthDays, holidayDates, isHoliday, getHoliday,
+    shifts, templates, holidays, leaveRequests, currentWeek, currentMonth, viewMode, loading,
+    weekDays, monthDays, holidayDates, isHoliday, getHoliday, getLeavesForDate,
     getShiftsForDateAndTemplate, getShiftsForDate,
-    loadTemplates, loadHolidays, loadShifts, load,
+    loadTemplates, loadHolidays, loadLeaves, loadShifts, load,
     previousWeek, nextWeek, previousMonth, nextMonth, setViewMode,
   }
 })

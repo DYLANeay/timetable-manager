@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Shift, ShiftTemplate } from '@/types'
 import type { PublicHoliday } from '@/api/holidays'
+import type { LeaveRequest } from '@/api/leaves'
 
 const { t, locale } = useI18n()
 
@@ -16,6 +17,7 @@ const props = defineProps<{
   templates: ShiftTemplate[]
   shifts: Shift[]
   holidays: PublicHoliday[]
+  leaveRequests: LeaveRequest[]
   isManager: boolean
 }>()
 
@@ -78,6 +80,12 @@ function handleCellClick(date: string, shiftType: 'morning' | 'afternoon') {
   }
 }
 
+function getLeavesForDate(date: string): LeaveRequest[] {
+  return props.leaveRequests.filter(
+    (l) => l.status === 'approved' && l.start_date <= date && l.end_date >= date,
+  )
+}
+
 function getInitials(name: string): string {
   return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
 }
@@ -121,6 +129,15 @@ function getInitials(name: string): string {
           :title="col.holidayName ?? ''"
         >
           {{ col.holidayName }}
+        </span>
+        <!-- Leave badges -->
+        <span
+          v-for="leave in getLeavesForDate(col.date)"
+          :key="`leave-${leave.id}`"
+          class="mt-0.5 max-w-full truncate rounded-full bg-orange-100 px-1.5 py-0.5 text-[9px] font-semibold text-orange-700 dark:bg-orange-900/40 dark:text-orange-300"
+          :title="leave.user.name"
+        >
+          {{ leave.user.name }}
         </span>
       </div>
     </div>
