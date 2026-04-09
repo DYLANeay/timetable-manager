@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { changePassword } from '@/api/auth'
 import { ApiError } from '@/api/client'
@@ -10,6 +11,12 @@ import { Badge } from '@/components/ui/badge'
 
 const { t } = useI18n()
 const auth = useAuthStore()
+const router = useRouter()
+
+async function handleLogout() {
+  await auth.logout()
+  router.push('/login')
+}
 
 const form = ref({ current_password: '', password: '', password_confirmation: '' })
 const loading = ref(false)
@@ -57,13 +64,16 @@ async function handleChangePassword() {
         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
           {{ auth.user?.name?.charAt(0)?.toUpperCase() }}
         </div>
-        <div>
+        <div class="flex-1">
           <p class="font-semibold">{{ auth.user?.name }}</p>
           <p class="text-sm text-muted-foreground">{{ auth.user?.email }}</p>
           <Badge class="mt-1" :variant="auth.isManager ? 'default' : 'secondary'">
             {{ auth.isManager ? $t('employees.roleManager') : $t('employees.roleEmployee') }}
           </Badge>
         </div>
+        <Button variant="ghost" class="text-destructive hover:text-destructive md:hidden" @click="handleLogout">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </Button>
       </CardContent>
     </Card>
 

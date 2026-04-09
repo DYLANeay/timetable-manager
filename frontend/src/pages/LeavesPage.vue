@@ -106,23 +106,25 @@ onMounted(load)
 
     <!-- Balance card -->
     <Card v-if="balance">
-      <CardContent class="flex items-center gap-6 p-4">
-        <div class="text-center">
-          <p class="text-2xl font-bold text-primary">{{ balance.remaining_days }}</p>
-          <p class="text-xs text-muted-foreground">{{ $t('leaves.remaining') }}</p>
+      <CardContent class="p-4">
+        <div class="flex items-center justify-around gap-2">
+          <div class="text-center">
+            <p class="text-2xl font-bold text-primary">{{ balance.remaining_days }}</p>
+            <p class="text-xs text-muted-foreground">{{ $t('leaves.remaining') }}</p>
+          </div>
+          <div class="h-8 w-px bg-border" />
+          <div class="text-center">
+            <p class="text-2xl font-bold">{{ balance.used_days }}</p>
+            <p class="text-xs text-muted-foreground">{{ $t('leaves.used') }}</p>
+          </div>
+          <div class="h-8 w-px bg-border" />
+          <div class="text-center">
+            <p class="text-2xl font-bold text-muted-foreground">{{ balance.total_days }}</p>
+            <p class="text-xs text-muted-foreground">{{ $t('leaves.total') }}</p>
+          </div>
         </div>
-        <div class="h-8 w-px bg-border" />
-        <div class="text-center">
-          <p class="text-2xl font-bold">{{ balance.used_days }}</p>
-          <p class="text-xs text-muted-foreground">{{ $t('leaves.used') }}</p>
-        </div>
-        <div class="h-8 w-px bg-border" />
-        <div class="text-center">
-          <p class="text-2xl font-bold text-muted-foreground">{{ balance.total_days }}</p>
-          <p class="text-xs text-muted-foreground">{{ $t('leaves.total') }}</p>
-        </div>
-        <div class="ml-auto">
-          <div class="h-2 w-32 overflow-hidden rounded-full bg-muted">
+        <div class="mt-3">
+          <div class="h-2 w-full overflow-hidden rounded-full bg-muted">
             <div
               class="h-full rounded-full bg-primary transition-all"
               :style="{ width: `${(balance.used_days / balance.total_days) * 100}%` }"

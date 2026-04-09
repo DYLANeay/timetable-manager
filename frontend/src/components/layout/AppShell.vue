@@ -127,13 +127,13 @@ function toggleLocale() {
       </aside>
 
       <!-- Main content -->
-      <main class="flex-1 overflow-auto pb-16 md:pb-0">
+      <main class="flex-1 overflow-auto pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0">
         <slot />
       </main>
     </div>
 
     <!-- Mobile bottom nav -->
-    <nav class="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
+    <nav class="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden" style="padding-bottom: env(safe-area-inset-bottom)">
       <div class="mx-auto flex h-14 max-w-md items-center justify-around">
         <RouterLink
           to="/schedule"

@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import type { Shift, ShiftTemplate } from '@/types'
 import type { PublicHoliday } from '@/api/holidays'
 import type { LeaveRequest } from '@/api/leaves'
+import { getUserColor, getInitials } from '@/composables/useUserColor'
 
 const { t, locale } = useI18n()
 
@@ -85,10 +86,6 @@ function getLeavesForDate(date: string): LeaveRequest[] {
   )
 }
 
-function getInitials(name: string): string {
-  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
-}
-
 function handleClick(date: string, shiftType: 'morning' | 'afternoon') {
   const template = getTemplate(date, shiftType)
   if (template && props.isManager) {
@@ -156,13 +153,13 @@ function handleClick(date: string, shiftType: 'morning' | 'afternoon') {
             <div
               v-for="shift in getShiftsForCell(col.date, 'morning')"
               :key="`m-${shift.id}`"
-              class="flex items-center gap-1 rounded bg-blue-100 px-1.5 py-0.5 dark:bg-blue-950/40"
-              :class="isManager ? 'hover:bg-blue-200 dark:hover:bg-blue-900/50' : ''"
+              class="flex items-center gap-1 rounded px-1.5 py-0.5"
+              :class="getUserColor(shift.user?.id ?? 0).bg"
             >
-              <div class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-blue-500 text-[8px] font-bold text-white">
+              <div class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[8px] font-bold text-white" :class="getUserColor(shift.user?.id ?? 0).avatar">
                 {{ getInitials(shift.user?.name ?? '?') }}
               </div>
-              <span class="truncate text-[10px] font-medium text-blue-900 dark:text-blue-200">{{ shift.user?.name }}</span>
+              <span class="truncate text-[10px] font-medium" :class="getUserColor(shift.user?.id ?? 0).text">{{ shift.user?.name }}</span>
             </div>
             <div
               v-if="isManager && getShiftsForCell(col.date, 'morning').length === 0 && col.isCurrentMonth"
@@ -181,13 +178,13 @@ function handleClick(date: string, shiftType: 'morning' | 'afternoon') {
             <div
               v-for="shift in getShiftsForCell(col.date, 'afternoon')"
               :key="`a-${shift.id}`"
-              class="flex items-center gap-1 rounded bg-violet-100 px-1.5 py-0.5 dark:bg-violet-950/40"
-              :class="isManager ? 'hover:bg-violet-200 dark:hover:bg-violet-900/50' : ''"
+              class="flex items-center gap-1 rounded px-1.5 py-0.5"
+              :class="getUserColor(shift.user?.id ?? 0).bg"
             >
-              <div class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-violet-500 text-[8px] font-bold text-white">
+              <div class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[8px] font-bold text-white" :class="getUserColor(shift.user?.id ?? 0).avatar">
                 {{ getInitials(shift.user?.name ?? '?') }}
               </div>
-              <span class="truncate text-[10px] font-medium text-violet-900 dark:text-violet-200">{{ shift.user?.name }}</span>
+              <span class="truncate text-[10px] font-medium" :class="getUserColor(shift.user?.id ?? 0).text">{{ shift.user?.name }}</span>
             </div>
             <div
               v-if="isManager && getShiftsForCell(col.date, 'afternoon').length === 0 && col.isCurrentMonth"
