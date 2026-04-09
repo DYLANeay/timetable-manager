@@ -120,3 +120,20 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  aside, nav, header button, .print\:hidden {
+    display: none !important;
+  }
+  body, html {
+    background: white !important;
+    color: black !important;
+  }
+  main {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  .min-h-\[120px\] {
+    min-height: 80px !important;
+  }
+}

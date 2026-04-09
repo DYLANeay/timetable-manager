@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\PublicHolidayController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\ShiftTemplateController;
 use App\Http\Controllers\SwapRequestController;
@@ -17,6 +18,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/shift-templates', [ShiftTemplateController::class, 'index']);
 
+    Route::get('/public-holidays', [PublicHolidayController::class, 'index']);
+
     Route::get('/shifts', [ShiftController::class, 'index']);
     Route::get('/shifts/my', [ShiftController::class, 'myShifts']);
 
@@ -31,6 +34,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/shifts/{shift}', [ShiftController::class, 'update']);
         Route::delete('/shifts/{shift}', [ShiftController::class, 'destroy']);
         Route::post('/shifts/bulk', [ShiftController::class, 'bulk']);
+
+        Route::post('/public-holidays', [PublicHolidayController::class, 'store']);
+        Route::delete('/public-holidays/{publicHoliday}', [PublicHolidayController::class, 'destroy']);
 
         Route::get('/employees', [EmployeeController::class, 'index']);
         Route::post('/employees', [EmployeeController::class, 'store']);

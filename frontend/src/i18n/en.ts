@@ -42,6 +42,7 @@ export default {
     remove: 'Remove',
     saving: 'Saving...',
     unassigned: 'Unassigned',
+    print: 'Print',
   },
   swaps: {
     title: 'Swap Requests',
@@ -73,6 +74,16 @@ export default {
     roleEmployee: 'Employee',
     roleManager: 'Manager',
     deactivate: 'Deactivate',
+  },
+  holidays: {
+    title: 'Public Holidays',
+    addHoliday: 'Add',
+    noHolidays: 'No public holidays for this year.',
+    date: 'Date',
+    name: 'Holiday name',
+    year: 'Year',
+    createHoliday: 'New Holiday',
+    createDescription: 'This day will use Sunday/holiday shift times.',
   },
   profile: {
     title: 'My profile',

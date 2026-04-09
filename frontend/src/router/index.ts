@@ -29,6 +29,12 @@ const router = createRouter({
       meta: { auth: true, manager: true },
     },
     {
+      path: '/holidays',
+      name: 'holidays',
+      component: () => import('@/pages/HolidaysPage.vue'),
+      meta: { auth: true, manager: true },
+    },
+    {
       path: '/profile',
       name: 'profile',
       component: () => import('@/pages/ProfilePage.vue'),

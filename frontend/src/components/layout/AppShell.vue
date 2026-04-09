@@ -2,11 +2,13 @@
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import { setLocale, getLocale } from '@/i18n'
+import { useDarkMode } from '@/composables/useDarkMode'
 import { ref } from 'vue'
 
 const auth = useAuthStore()
 const router = useRouter()
 const currentLocale = ref(getLocale())
+const { isDark, toggle: toggleDark } = useDarkMode()
 
 async function handleLogout() {
   await auth.logout()
@@ -49,18 +51,38 @@ function toggleLocale() {
             {{ $t('nav.swaps') }}
           </RouterLink>
 
-          <RouterLink
-            v-if="auth.isManager"
-            to="/employees"
-            class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-            active-class="!bg-accent !text-accent-foreground"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            {{ $t('nav.employees') }}
-          </RouterLink>
+          <template v-if="auth.isManager">
+            <RouterLink
+              to="/employees"
+              class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              active-class="!bg-accent !text-accent-foreground"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              {{ $t('nav.employees') }}
+            </RouterLink>
+
+            <RouterLink
+              to="/holidays"
+              class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              active-class="!bg-accent !text-accent-foreground"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              {{ $t('holidays.title') }}
+            </RouterLink>
+          </template>
         </nav>
 
-        <div class="border-t p-2">
+        <div class="border-t p-2 space-y-1">
+          <!-- Dark mode toggle -->
+          <button
+            class="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+            @click="toggleDark"
+          >
+            <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            {{ isDark ? 'Mode clair' : 'Mode sombre' }}
+          </button>
+
           <!-- Language toggle -->
           <button
             class="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
@@ -132,13 +154,16 @@ function toggleLocale() {
           {{ $t('nav.employees') }}
         </RouterLink>
 
-        <button
-          class="flex flex-col items-center gap-0.5 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
-          @click="handleLogout"
+        <RouterLink
+          to="/profile"
+          class="flex flex-col items-center gap-0.5 text-[11px] text-muted-foreground transition-colors"
+          active-class="!text-primary"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          {{ $t('nav.logout') }}
-        </button>
+          <div class="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+            {{ auth.user?.name?.charAt(0)?.toUpperCase() }}
+          </div>
+          {{ $t('profile.title') }}
+        </RouterLink>
       </div>
     </nav>
   </div>
