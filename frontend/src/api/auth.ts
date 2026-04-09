@@ -16,6 +16,13 @@ export function fetchMe(): Promise<User> {
   return api<User>('/auth/me')
 }
 
+export function updateAvatar(avatar: string): Promise<User> {
+  return api<User>('/auth/avatar', {
+    method: 'PUT',
+    body: JSON.stringify({ avatar }),
+  })
+}
+
 export function changePassword(data: {
   current_password: string
   password: string

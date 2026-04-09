@@ -16,6 +16,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [LoginController::class, 'me']);
     Route::post('/auth/logout', [LoginController::class, 'logout']);
     Route::put('/auth/password', [LoginController::class, 'changePassword']);
+    Route::put('/auth/avatar', [LoginController::class, 'updateAvatar']);
 
     Route::get('/shift-templates', [ShiftTemplateController::class, 'index']);
 

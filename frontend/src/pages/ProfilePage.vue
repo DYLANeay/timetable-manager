@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { changePassword } from '@/api/auth'
+import { changePassword, updateAvatar } from '@/api/auth'
 import { ApiError } from '@/api/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -16,6 +16,24 @@ const router = useRouter()
 async function handleLogout() {
   await auth.logout()
   router.push('/login')
+}
+
+function handleAvatarClick() {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = 'image/*'
+  input.onchange = async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = async () => {
+      const dataUrl = reader.result as string
+      const user = await updateAvatar(dataUrl)
+      auth.user = user
+    }
+    reader.readAsDataURL(file)
+  }
+  input.click()
 }
 
 const form = ref({ current_password: '', password: '', password_confirmation: '' })
@@ -61,9 +79,17 @@ async function handleChangePassword() {
     <!-- User info -->
     <Card>
       <CardContent class="flex items-center gap-4 p-4">
-        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
-          {{ auth.user?.name?.charAt(0)?.toUpperCase() }}
-        </div>
+        <button
+          class="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-primary text-lg font-bold text-primary-foreground ring-2 ring-transparent transition hover:ring-primary"
+          title="Changer la photo"
+          @click="handleAvatarClick"
+        >
+          <img v-if="auth.user?.avatar" :src="auth.user.avatar" class="h-full w-full object-cover" alt="" />
+          <span v-else>{{ auth.user?.name?.charAt(0)?.toUpperCase() }}</span>
+          <div class="absolute inset-0 flex items-center justify-center rounded-full bg-black/30 opacity-0 transition hover:opacity-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+        </button>
         <div class="flex-1">
           <p class="font-semibold">{{ auth.user?.name }}</p>
           <p class="text-sm text-muted-foreground">{{ auth.user?.email }}</p>

@@ -54,6 +54,17 @@ class LoginController extends Controller
         return response()->json($request->user());
     }
 
+    public function updateAvatar(Request $request): JsonResponse
+    {
+        $request->validate([
+            'avatar' => ['required', 'string', 'max:2000000'],
+        ]);
+
+        $request->user()->update(['avatar' => $request->avatar]);
+
+        return response()->json($request->user());
+    }
+
     public function changePassword(Request $request): JsonResponse
     {
         $validated = $request->validate([

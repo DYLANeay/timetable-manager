@@ -107,8 +107,9 @@ function toggleLocale() {
             class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors hover:bg-accent"
             active-class="!bg-accent"
           >
-            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
-              {{ auth.user?.name?.charAt(0)?.toUpperCase() }}
+            <div class="flex h-7 w-7 shrink-0 overflow-hidden rounded-full bg-primary text-xs font-medium text-primary-foreground">
+              <img v-if="auth.user?.avatar" :src="auth.user.avatar" class="h-full w-full object-cover" alt="" />
+              <span v-else class="flex h-full w-full items-center justify-center">{{ auth.user?.name?.charAt(0)?.toUpperCase() }}</span>
             </div>
             <div class="flex-1 truncate">
               <p class="truncate text-sm font-medium">{{ auth.user?.name }}</p>
@@ -177,8 +178,9 @@ function toggleLocale() {
           class="flex flex-col items-center gap-0.5 text-[11px] text-muted-foreground transition-colors"
           active-class="!text-primary"
         >
-          <div class="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
-            {{ auth.user?.name?.charAt(0)?.toUpperCase() }}
+          <div class="flex h-5 w-5 shrink-0 overflow-hidden rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+            <img v-if="auth.user?.avatar" :src="auth.user.avatar" class="h-full w-full object-cover" alt="" />
+            <span v-else class="flex h-full w-full items-center justify-center">{{ auth.user?.name?.charAt(0)?.toUpperCase() }}</span>
           </div>
           {{ $t('profile.title') }}
         </RouterLink>
