@@ -19,6 +19,11 @@ const emit = defineEmits<{
   setView: [mode: ViewMode]
 }>()
 
+function parseLocal(s: string): Date {
+  const [y, m, d] = s.split('-').map(Number)
+  return new Date(y!, m! - 1, d!)
+}
+
 const label = computed(() => {
   const loc = locale.value === 'fr' ? 'fr-CH' : 'en-US'
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
@@ -29,15 +34,28 @@ const label = computed(() => {
     return capitalize(new Intl.DateTimeFormat(loc, { month: 'long', year: 'numeric' }).format(d))
   }
 
-  const start = new Date(props.currentWeek)
-  const end = new Date(start)
-  end.setDate(start.getDate() + 6)
+  const start = parseLocal(props.currentWeek)
+  const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6)
   const fmtMonth = new Intl.DateTimeFormat(loc, { month: 'long' })
   const startMonth = fmtMonth.format(start)
   const endMonth = fmtMonth.format(end)
   const year = end.getFullYear()
   if (startMonth === endMonth) return `${capitalize(startMonth)} ${year}`
   return `${capitalize(startMonth)} – ${capitalize(endMonth)} ${year}`
+})
+
+// Mobile: show week day range e.g. "17–23"
+const weekRangeLabel = computed(() => {
+  if (props.viewMode !== 'week') return ''
+  const start = parseLocal(props.currentWeek)
+  const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6)
+  const loc = locale.value === 'fr' ? 'fr-CH' : 'en-US'
+  const fmtDay = new Intl.DateTimeFormat(loc, { day: 'numeric' })
+  const fmtDayMonth = new Intl.DateTimeFormat(loc, { day: 'numeric', month: 'short' })
+  if (start.getMonth() === end.getMonth()) {
+    return `${fmtDay.format(start)}–${fmtDay.format(end)}`
+  }
+  return `${fmtDay.format(start)}–${fmtDayMonth.format(end)}`
 })
 
 const isCurrentPeriod = computed(() => {
@@ -55,7 +73,10 @@ const isCurrentPeriod = computed(() => {
 
 <template>
   <div class="flex flex-1 items-center gap-2">
-    <h2 class="text-lg font-semibold tracking-tight md:text-xl">{{ label }}</h2>
+    <div class="flex items-baseline gap-2">
+      <h2 class="text-lg font-semibold tracking-tight md:text-xl">{{ label }}</h2>
+      <span v-if="weekRangeLabel" class="text-sm font-medium text-muted-foreground md:hidden">{{ weekRangeLabel }}</span>
+    </div>
 
     <div class="ml-auto flex items-center gap-1">
       <!-- View toggle — desktop only -->
