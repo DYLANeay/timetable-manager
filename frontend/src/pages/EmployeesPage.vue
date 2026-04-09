@@ -78,16 +78,21 @@ onMounted(load)
 
     <div v-else class="space-y-3">
       <Card v-for="emp in employees" :key="emp.id">
-        <CardContent class="flex items-center justify-between p-4">
-          <div>
-            <p class="font-medium">{{ emp.name }}</p>
-            <p class="text-sm text-muted-foreground">{{ emp.email }}</p>
+        <CardContent class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex items-center gap-3">
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+              {{ emp.name.charAt(0).toUpperCase() }}
+            </div>
+            <div>
+              <p class="font-medium">{{ emp.name }}</p>
+              <p class="text-sm text-muted-foreground">{{ emp.email }}</p>
+            </div>
           </div>
           <div class="flex items-center gap-2">
             <Badge :variant="emp.role === 'manager' ? 'default' : 'secondary'">
               {{ emp.role === 'manager' ? $t('employees.roleManager') : $t('employees.roleEmployee') }}
             </Badge>
-            <Button size="sm" variant="outline" @click="openEdit(emp)">{{ $t('common.edit') }}</Button>
+            <Button size="sm" variant="outline" class="ml-auto sm:ml-0" @click="openEdit(emp)">{{ $t('common.edit') }}</Button>
             <Button size="sm" variant="destructive" @click="handleDeactivate(emp)">
               {{ $t('employees.deactivate') }}
             </Button>
