@@ -147,32 +147,57 @@ function handleClick(date: string, shiftType: 'morning' | 'afternoon') {
 
         <!-- Shift chips -->
         <div class="space-y-0.5">
+          <!-- Morning -->
           <div
-            v-for="shift in getShiftsForCell(col.date, 'morning')"
-            :key="`m-${shift.id}`"
-            class="flex items-center gap-1 rounded bg-blue-100 px-1.5 py-0.5 dark:bg-blue-950/40"
-            :class="isManager ? 'cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-900/50' : ''"
+            v-if="getShiftsForCell(col.date, 'morning').length > 0 || (isManager && col.isCurrentMonth)"
+            :class="isManager ? 'cursor-pointer' : ''"
             @click="handleClick(col.date, 'morning')"
           >
-            <div class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-blue-500 text-[8px] font-bold text-white">
-              {{ getInitials(shift.user?.name ?? '?') }}
+            <div
+              v-for="shift in getShiftsForCell(col.date, 'morning')"
+              :key="`m-${shift.id}`"
+              class="flex items-center gap-1 rounded bg-blue-100 px-1.5 py-0.5 dark:bg-blue-950/40"
+              :class="isManager ? 'hover:bg-blue-200 dark:hover:bg-blue-900/50' : ''"
+            >
+              <div class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-blue-500 text-[8px] font-bold text-white">
+                {{ getInitials(shift.user?.name ?? '?') }}
+              </div>
+              <span class="truncate text-[10px] font-medium text-blue-900 dark:text-blue-200">{{ shift.user?.name }}</span>
             </div>
-            <span class="truncate text-[10px] font-medium text-blue-900 dark:text-blue-200">{{ shift.user?.name }}</span>
+            <div
+              v-if="isManager && getShiftsForCell(col.date, 'morning').length === 0 && col.isCurrentMonth"
+              class="flex h-5 items-center justify-center rounded border border-dashed border-blue-300/40 text-[8px] text-blue-400 opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              + {{ t('schedule.morning') }}
+            </div>
           </div>
 
+          <!-- Afternoon -->
           <div
-            v-for="shift in getShiftsForCell(col.date, 'afternoon')"
-            :key="`a-${shift.id}`"
-            class="flex items-center gap-1 rounded bg-violet-100 px-1.5 py-0.5 dark:bg-violet-950/40"
-            :class="isManager ? 'cursor-pointer hover:bg-violet-200 dark:hover:bg-violet-900/50' : ''"
+            v-if="getShiftsForCell(col.date, 'afternoon').length > 0 || (isManager && col.isCurrentMonth)"
+            :class="isManager ? 'cursor-pointer' : ''"
             @click="handleClick(col.date, 'afternoon')"
           >
-            <div class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-violet-500 text-[8px] font-bold text-white">
-              {{ getInitials(shift.user?.name ?? '?') }}
+            <div
+              v-for="shift in getShiftsForCell(col.date, 'afternoon')"
+              :key="`a-${shift.id}`"
+              class="flex items-center gap-1 rounded bg-violet-100 px-1.5 py-0.5 dark:bg-violet-950/40"
+              :class="isManager ? 'hover:bg-violet-200 dark:hover:bg-violet-900/50' : ''"
+            >
+              <div class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-violet-500 text-[8px] font-bold text-white">
+                {{ getInitials(shift.user?.name ?? '?') }}
+              </div>
+              <span class="truncate text-[10px] font-medium text-violet-900 dark:text-violet-200">{{ shift.user?.name }}</span>
             </div>
-            <span class="truncate text-[10px] font-medium text-violet-900 dark:text-violet-200">{{ shift.user?.name }}</span>
+            <div
+              v-if="isManager && getShiftsForCell(col.date, 'afternoon').length === 0 && col.isCurrentMonth"
+              class="flex h-5 items-center justify-center rounded border border-dashed border-violet-300/40 text-[8px] text-violet-400 opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              + {{ t('schedule.afternoon') }}
+            </div>
           </div>
 
+          <!-- Leaves -->
           <div
             v-for="leave in getLeavesForDate(col.date)"
             :key="`l-${leave.id}`"
@@ -180,14 +205,6 @@ function handleClick(date: string, shiftType: 'morning' | 'afternoon') {
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 shrink-0 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
             <span class="truncate text-[10px] font-medium text-orange-900 dark:text-orange-200">Vacances : {{ leave.user.name }}</span>
-          </div>
-
-          <div
-            v-if="isManager && getShiftsForCell(col.date, 'morning').length === 0 && getShiftsForCell(col.date, 'afternoon').length === 0 && col.isCurrentMonth"
-            class="flex h-6 items-center justify-center rounded border border-dashed border-border/30 opacity-0 transition-opacity group-hover:opacity-100"
-            @click="handleClick(col.date, 'morning')"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-muted-foreground/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </div>
         </div>
       </div>
