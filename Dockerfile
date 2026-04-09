@@ -2,7 +2,7 @@
 FROM node:22-alpine AS frontend
 WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 COPY frontend/ .
 ENV VITE_API_URL=/api
 RUN npm run build
