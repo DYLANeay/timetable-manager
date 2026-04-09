@@ -24,5 +24,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'employee@station.com',
             'role' => Role::Employee,
         ]);
+
+        $this->call(ShiftTemplateSeeder::class);
     }
 }
