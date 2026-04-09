@@ -178,10 +178,8 @@ function handleClick(date: string, shiftType: 'morning' | 'afternoon') {
             :key="`l-${leave.id}`"
             class="flex items-center gap-1 rounded bg-orange-100 px-1.5 py-0.5 dark:bg-orange-950/40"
           >
-            <div class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-orange-500 text-[8px] font-bold text-white">
-              {{ getInitials(leave.user.name) }}
-            </div>
-            <span class="truncate text-[10px] font-medium text-orange-900 dark:text-orange-200">{{ leave.user.name }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 shrink-0 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            <span class="truncate text-[10px] font-medium text-orange-900 dark:text-orange-200">Vacances : {{ leave.user.name }}</span>
           </div>
 
           <div

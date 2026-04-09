@@ -137,7 +137,7 @@ function getInitials(name: string): string {
           class="mt-0.5 max-w-full truncate rounded-full bg-orange-100 px-1.5 py-0.5 text-[9px] font-semibold text-orange-700 dark:bg-orange-900/40 dark:text-orange-300"
           :title="leave.user.name"
         >
-          {{ leave.user.name }}
+          Vacances : {{ leave.user.name }}
         </span>
       </div>
     </div>
