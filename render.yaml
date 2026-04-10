@@ -6,7 +6,7 @@ services:
     dockerfilePath: ./Dockerfile
     envVars:
       - key: APP_NAME
-        value: "Horaires Socar"
+        value: "Horaires Station"
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
@@ -41,9 +41,9 @@ services:
       - key: MAIL_PASSWORD
         sync: false
       - key: MAIL_FROM_ADDRESS
-        value: "manager@socar.ch"
+        value: "manager@station.ch"
       - key: MAIL_FROM_NAME
-        value: "Horaires Socar"
+        value: "Horaires Station"
       - key: SESSION_DRIVER
         value: cookie
       - key: CACHE_STORE

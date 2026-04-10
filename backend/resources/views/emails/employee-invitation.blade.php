@@ -1,5 +1,5 @@
 <x-mail::message>
-# Bienvenue sur Horaires Socar, {{ $employee->name }} !
+# Bienvenue sur Horaires Station, {{ $employee->name }} !
 
 Votre compte a été créé par votre responsable. Voici vos identifiants de connexion :
 
@@ -13,5 +13,5 @@ Se connecter
 **Important :** Pour votre sécurité, veuillez changer votre mot de passe dès votre première connexion via votre profil.
 
 Cordialement,
-L'équipe Socar
+L'équipe Station
 </x-mail::message>

@@ -21,7 +21,7 @@ class EmployeeInvitation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Votre accès Horaires Socar',
+            subject: 'Votre accès Horaires Station',
         );
     }
 

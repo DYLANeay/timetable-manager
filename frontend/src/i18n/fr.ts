@@ -18,7 +18,7 @@ export default {
     signingIn: 'Connexion...',
     email: 'Email',
     password: 'Mot de passe',
-    title: 'Horaires Socar',
+    title: 'Horaires Station',
     subtitle: 'Connectez-vous à votre compte',
     loginFailed: 'Échec de la connexion',
     unexpectedError: 'Une erreur inattendue est survenue',
@@ -37,7 +37,7 @@ export default {
     employees: 'Équipe',
     leaves: 'Vacances',
     logout: 'Déconnexion',
-    timetable: 'Horaires Socar',
+    timetable: 'Horaires Station',
   },
   schedule: {
     title: 'Planning hebdomadaire',
