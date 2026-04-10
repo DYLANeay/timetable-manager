@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Role;
+use App\Notifications\ResetPasswordNotification;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -27,6 +28,13 @@ class User extends Authenticatable
             'role' => Role::class,
             'is_active' => 'boolean',
         ];
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $userLocale = app()->getLocale();
+        $notification = (new ResetPasswordNotification($token, $userLocale))->locale($userLocale);
+        $this->notify($notification);
     }
 
     public function isManager(): bool

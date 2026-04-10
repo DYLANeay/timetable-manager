@@ -11,6 +11,18 @@ const router = createRouter({
       meta: { guest: true },
     },
     {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: () => import('@/pages/ForgotPasswordPage.vue'),
+      meta: { guest: true },
+    },
+    {
+      path: '/reset-password',
+      name: 'reset-password',
+      component: () => import('@/pages/ResetPasswordPage.vue'),
+      meta: { guest: true },
+    },
+    {
       path: '/schedule',
       name: 'schedule',
       component: () => import('@/pages/SchedulePage.vue'),

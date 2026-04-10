@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PublicHolidayController;
 use App\Http\Controllers\LeaveRequestController;
@@ -11,6 +12,8 @@ use App\Http\Middleware\EnsureIsManager;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [LoginController::class, 'login']);
+Route::post('/auth/forgot-password', [PasswordResetController::class, 'forgotPassword']);
+Route::post('/auth/reset-password', [PasswordResetController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [LoginController::class, 'me']);

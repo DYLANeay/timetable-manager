@@ -60,7 +60,12 @@ async function handleLogin() {
         </div>
 
         <div class="space-y-2">
-          <label for="password" class="text-sm font-medium">{{ $t('auth.password') }}</label>
+          <div class="flex items-center justify-between">
+            <label for="password" class="text-sm font-medium">{{ $t('auth.password') }}</label>
+            <router-link to="/forgot-password" class="text-xs text-muted-foreground hover:text-foreground">
+              {{ $t('auth.forgotPassword') }}
+            </router-link>
+          </div>
           <input
             id="password"
             v-model="password"
