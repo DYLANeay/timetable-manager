@@ -20,11 +20,14 @@ const props = defineProps<{
   holidays: PublicHoliday[]
   leaveRequests: LeaveRequest[]
   isManager: boolean
+  currentUserId: number
+  pendingShiftIds: Set<number>
 }>()
 
 const emit = defineEmits<{
   cellClick: [date: string, template: ShiftTemplate]
   jumpToWeek: [mondayDate: string, targetDate: string]
+  shiftClick: [shift: Shift]
 }>()
 
 const now = new Date()
@@ -142,6 +145,20 @@ function handleCellClick(date: string, shiftType: 'morning' | 'afternoon') {
   if (template && props.isManager) {
     emit('cellClick', date, template)
   }
+}
+
+function handleShiftClick(shift: Shift, event: MouseEvent) {
+  if (props.isManager) return
+  event.stopPropagation()
+  if (shift.user?.id !== props.currentUserId) {
+    emit('shiftClick', shift)
+  }
+}
+
+const STRIPE = 'repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.07) 5px, rgba(0,0,0,0.07) 10px)'
+
+function shiftStyle(shift: Shift): Record<string, string> {
+  return props.pendingShiftIds.has(shift.id) ? { backgroundImage: STRIPE } : {}
 }
 </script>
 
@@ -269,7 +286,9 @@ function handleCellClick(date: string, shiftType: 'morning' | 'afternoon') {
             <div class="space-y-1">
               <div v-for="shift in getShiftsForCell(col.date, 'morning')" :key="shift.id"
                 class="flex items-center gap-1.5 rounded-md p-1.5 ring-1"
-                :class="[getUserColor(shift.user?.id ?? 0).bg, 'ring-black/5']"
+                :class="[getUserColor(shift.user?.id ?? 0).bg, 'ring-black/5', !isManager && shift.user?.id !== currentUserId ? 'cursor-pointer hover:brightness-95' : '']"
+                :style="shiftStyle(shift)"
+                @click="handleShiftClick(shift, $event)"
               >
                 <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-medium text-white" :class="getUserColor(shift.user?.id ?? 0).avatar">
                   {{ getInitials(shift.user?.name ?? '?') }}
@@ -300,7 +319,9 @@ function handleCellClick(date: string, shiftType: 'morning' | 'afternoon') {
             <div class="space-y-1">
               <div v-for="shift in getShiftsForCell(col.date, 'morning')" :key="shift.id"
                 class="flex items-center gap-1 rounded p-1 ring-1 ring-black/5"
-                :class="getUserColor(shift.user?.id ?? 0).bg"
+                :class="[getUserColor(shift.user?.id ?? 0).bg, !isManager && shift.user?.id !== currentUserId ? 'cursor-pointer hover:brightness-95' : '']"
+                :style="shiftStyle(shift)"
+                @click="handleShiftClick(shift, $event)"
               >
                 <div class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[8px] font-bold text-white" :class="getUserColor(shift.user?.id ?? 0).avatar">
                   {{ getInitials(shift.user?.name ?? '?') }}
@@ -340,7 +361,9 @@ function handleCellClick(date: string, shiftType: 'morning' | 'afternoon') {
             <div class="space-y-1">
               <div v-for="shift in getShiftsForCell(col.date, 'afternoon')" :key="shift.id"
                 class="flex items-center gap-1.5 rounded-md p-1.5 ring-1 ring-black/5"
-                :class="getUserColor(shift.user?.id ?? 0).bg"
+                :class="[getUserColor(shift.user?.id ?? 0).bg, !isManager && shift.user?.id !== currentUserId ? 'cursor-pointer hover:brightness-95' : '']"
+                :style="shiftStyle(shift)"
+                @click="handleShiftClick(shift, $event)"
               >
                 <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-medium text-white" :class="getUserColor(shift.user?.id ?? 0).avatar">
                   {{ getInitials(shift.user?.name ?? '?') }}
@@ -371,7 +394,9 @@ function handleCellClick(date: string, shiftType: 'morning' | 'afternoon') {
             <div class="space-y-1">
               <div v-for="shift in getShiftsForCell(col.date, 'afternoon')" :key="shift.id"
                 class="flex items-center gap-1 rounded p-1 ring-1 ring-black/5"
-                :class="getUserColor(shift.user?.id ?? 0).bg"
+                :class="[getUserColor(shift.user?.id ?? 0).bg, !isManager && shift.user?.id !== currentUserId ? 'cursor-pointer hover:brightness-95' : '']"
+                :style="shiftStyle(shift)"
+                @click="handleShiftClick(shift, $event)"
               >
                 <div class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[8px] font-bold text-white" :class="getUserColor(shift.user?.id ?? 0).avatar">
                   {{ getInitials(shift.user?.name ?? '?') }}

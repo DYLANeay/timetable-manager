@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { onMounted, watch, ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useShiftStore } from '@/stores/shifts'
 import WeekPicker from '@/components/shifts/WeekPicker.vue'
 import WeeklyTimetable from '@/components/shifts/WeeklyTimetable.vue'
 import MonthlyTimetable from '@/components/shifts/MonthlyTimetable.vue'
 import AssignShiftDialog from '@/components/shifts/AssignShiftDialog.vue'
-import { ref } from 'vue'
+import RequestSwapDialog from '@/components/swaps/RequestSwapDialog.vue'
+import { fetchSwapRequests, type SwapRequestData } from '@/api/swaps'
 import type { Shift, ShiftTemplate } from '@/types'
 import type { ViewMode } from '@/stores/shifts'
 
@@ -18,13 +19,37 @@ const selectedDate = ref('')
 const selectedTemplate = ref<ShiftTemplate | null>(null)
 const selectedShift = ref<Shift | undefined>(undefined)
 
+const swapDialogOpen = ref(false)
+const swapTargetShift = ref<Shift | null>(null)
+
+const swapRequests = ref<SwapRequestData[]>([])
+
+const TERMINAL = new Set(['manager_approved', 'manager_denied', 'cancelled'])
+
+const pendingShiftIds = computed(() => {
+  const ids = new Set<number>()
+  for (const req of swapRequests.value) {
+    if (!TERMINAL.has(req.status)) {
+      ids.add(req.requester_shift.id)
+      if (req.target_shift) ids.add(req.target_shift.id)
+    }
+  }
+  return ids
+})
+
+async function loadAll() {
+  await shiftStore.load()
+  const res = await fetchSwapRequests()
+  swapRequests.value = res.data
+}
+
 onMounted(async () => {
   await shiftStore.loadTemplates()
-  await shiftStore.load()
+  await loadAll()
 })
 
 watch([() => shiftStore.currentWeek, () => shiftStore.currentMonth, () => shiftStore.viewMode], () => {
-  shiftStore.load()
+  loadAll()
 })
 
 function handleCellClick(date: string, template: ShiftTemplate) {
@@ -34,8 +59,18 @@ function handleCellClick(date: string, template: ShiftTemplate) {
   dialogOpen.value = true
 }
 
+function handleShiftClick(shift: Shift) {
+  swapTargetShift.value = shift
+  swapDialogOpen.value = true
+}
+
+function handleSwapCreated() {
+  swapDialogOpen.value = false
+  loadAll()
+}
+
 function handleSaved() {
-  shiftStore.load()
+  loadAll()
 }
 
 function handleJumpToWeek(monday: string) {
@@ -114,8 +149,11 @@ function printSchedule() {
           :holidays="shiftStore.holidays"
           :leave-requests="shiftStore.leaveRequests"
           :is-manager="auth.isManager"
+          :current-user-id="auth.user?.id ?? 0"
+          :pending-shift-ids="pendingShiftIds"
           @cell-click="handleCellClick"
           @jump-to-week="handleJumpToWeek"
+          @shift-click="handleShiftClick"
         />
         <MonthlyTimetable
           v-else
@@ -126,7 +164,10 @@ function printSchedule() {
           :holidays="shiftStore.holidays"
           :leave-requests="shiftStore.leaveRequests"
           :is-manager="auth.isManager"
+          :current-user-id="auth.user?.id ?? 0"
+          :pending-shift-ids="pendingShiftIds"
           @cell-click="handleCellClick"
+          @shift-click="handleShiftClick"
         />
       </template>
     </div>
@@ -140,5 +181,13 @@ function printSchedule() {
     :existing-shift="selectedShift"
     @update:open="dialogOpen = $event"
     @saved="handleSaved"
+  />
+
+  <RequestSwapDialog
+    v-if="swapDialogOpen && swapTargetShift"
+    :open="swapDialogOpen"
+    :target-shift="swapTargetShift"
+    @update:open="swapDialogOpen = $event"
+    @created="handleSwapCreated"
   />
 </template>
