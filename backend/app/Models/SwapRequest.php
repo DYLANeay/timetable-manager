@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'requester_id', 'target_id', 'requester_shift_id', 'target_shift_id',
-    'status', 'peer_responded_at', 'manager_decided_at', 'manager_id', 'note',
+    'type', 'status', 'peer_responded_at', 'manager_decided_at', 'manager_id', 'note',
 ])]
 class SwapRequest extends Model
 {
@@ -45,5 +45,10 @@ class SwapRequest extends Model
     public function manager(): BelongsTo
     {
         return $this->belongsTo(User::class, 'manager_id');
+    }
+
+    public function isGiveaway(): bool
+    {
+        return $this->type === 'giveaway';
     }
 }

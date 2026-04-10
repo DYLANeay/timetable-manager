@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/swap-requests', [SwapRequestController::class, 'index']);
     Route::post('/swap-requests', [SwapRequestController::class, 'store']);
     Route::put('/swap-requests/{swapRequest}/respond', [SwapRequestController::class, 'respond']);
+    Route::put('/swap-requests/{swapRequest}/claim', [SwapRequestController::class, 'claim']);
     Route::put('/swap-requests/{swapRequest}/cancel', [SwapRequestController::class, 'cancel']);
 
     Route::middleware(EnsureIsManager::class)->group(function () {

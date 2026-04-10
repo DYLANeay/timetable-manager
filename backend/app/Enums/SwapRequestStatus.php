@@ -4,6 +4,7 @@ namespace App\Enums;
 
 enum SwapRequestStatus: string
 {
+    case Open = 'open';
     case PendingPeer = 'pending_peer';
     case PeerAccepted = 'peer_accepted';
     case PeerDeclined = 'peer_declined';

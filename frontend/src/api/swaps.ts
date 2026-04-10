@@ -2,10 +2,11 @@ import { api } from './client'
 
 export interface SwapRequestData {
   id: number
+  type: 'swap' | 'giveaway'
   status: string
   note: string | null
   requester: { id: number; name: string }
-  target: { id: number; name: string }
+  target: { id: number; name: string } | null
   requester_shift: {
     id: number
     date: string
@@ -15,7 +16,7 @@ export interface SwapRequestData {
     id: number
     date: string
     shift_template: { shift_type: string; start_time: string; end_time: string }
-  }
+  } | null
   manager: { id: number; name: string } | null
   peer_responded_at: string | null
   manager_decided_at: string | null
@@ -39,6 +40,20 @@ export function createSwapRequest(data: {
     method: 'POST',
     body: JSON.stringify(data),
   })
+}
+
+export function createGiveaway(data: {
+  requester_shift_id: number
+  note?: string
+}): Promise<{ data: SwapRequestData }> {
+  return api('/swap-requests', {
+    method: 'POST',
+    body: JSON.stringify({ ...data, type: 'giveaway' }),
+  })
+}
+
+export function claimGiveaway(id: number): Promise<{ data: SwapRequestData }> {
+  return api(`/swap-requests/${id}/claim`, { method: 'PUT' })
 }
 
 export function respondToSwapRequest(
