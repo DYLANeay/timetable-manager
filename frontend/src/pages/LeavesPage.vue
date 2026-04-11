@@ -198,14 +198,14 @@ onMounted(load)
         <DialogTitle>{{ $t('leaves.requestTitle') }}</DialogTitle>
         <DialogDescription>{{ $t('leaves.requestDescription') }}</DialogDescription>
       </DialogHeader>
-      <form class="space-y-4 py-4" @submit.prevent="handleCreate">
+      <form class="min-w-0 space-y-4 py-4" @submit.prevent="handleCreate">
         <div class="space-y-2">
           <label class="text-sm font-medium">{{ $t('leaves.startDate') }}</label>
           <input
             v-model="form.start_date"
             type="date"
             required
-            class="block h-10 w-full min-w-0 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            class="block h-10 w-full max-w-full min-w-0 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
         </div>
         <div class="space-y-2">
@@ -214,7 +214,7 @@ onMounted(load)
             v-model="form.end_date"
             type="date"
             required
-            class="block h-10 w-full min-w-0 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            class="block h-10 w-full max-w-full min-w-0 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
         </div>
         <div class="space-y-2">
