@@ -14,3 +14,11 @@ app.use(router)
 app.use(i18n)
 
 app.mount('#app')
+
+router.isReady().then(() => {
+  const splash = document.getElementById('splash')
+  if (splash) {
+    splash.classList.add('hidden')
+    splash.addEventListener('transitionend', () => splash.remove(), { once: true })
+  }
+})
