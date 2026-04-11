@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useNotificationsStore } from '@/stores/notifications'
+import { getNotificationMessage, getNotificationRoute } from '@/utils/notificationMessage'
 import type { AppNotification } from '@/types'
 
 const { t, locale } = useI18n()
@@ -66,79 +67,12 @@ onUnmounted(() => {
   window.removeEventListener('resize', updatePanelPosition)
 })
 
-// ── Message rendering ──────────────────────────────────────────────────────
-
-function formatDate(dateStr: string): string {
-  const loc = locale.value === 'fr' ? 'fr-CH' : 'en-US'
-  return new Intl.DateTimeFormat(loc, { weekday: 'short', day: 'numeric', month: 'short' }).format(
-    new Date(dateStr + 'T12:00:00'),
-  )
-}
-
-function shiftLabel(type: string): string {
-  return t(`schedule.${type}`)
-}
-
 function getMessage(n: AppNotification): string {
-  const d = n.data
-  const name = d.requester_name ?? ''
-  switch (n.type) {
-    case 'swap_request':
-      return d.swap_type === 'giveaway'
-        ? t('notifications.types.giveaway_request', { name })
-        : t('notifications.types.swap_request', { name })
-    case 'leave_request':
-      return t('notifications.types.leave_request', { name })
-    case 'holiday_request':
-      return t('notifications.types.holiday_request', { name })
-    case 'swap_targeting_you':
-      return t('notifications.types.swap_targeting_you', { name })
-    case 'planning_updated':
-      return d.action === 'created'
-        ? t('notifications.types.planning_created', {
-            shift: shiftLabel(d.shift_type ?? ''),
-            date: formatDate(d.date ?? ''),
-          })
-        : t('notifications.types.planning_deleted', {
-            shift: shiftLabel(d.shift_type ?? ''),
-            date: formatDate(d.date ?? ''),
-          })
-    case 'swap_decided':
-      if (d.swap_type === 'giveaway') {
-        return d.decision === 'approved'
-          ? t('notifications.types.giveaway_approved', { date: formatDate(d.shift_date ?? '') })
-          : t('notifications.types.giveaway_denied', { date: formatDate(d.shift_date ?? '') })
-      }
-      return d.decision === 'approved'
-        ? t('notifications.types.swap_approved', { date: formatDate(d.shift_date ?? '') })
-        : t('notifications.types.swap_denied', { date: formatDate(d.shift_date ?? '') })
-    case 'leave_decided':
-      return d.decision === 'approved'
-        ? t('notifications.types.leave_approved', {
-            start: formatDate(d.start_date ?? ''),
-            end: formatDate(d.end_date ?? ''),
-          })
-        : t('notifications.types.leave_denied')
-    default:
-      return n.type
-  }
-}
-
-function getRoute(n: AppNotification): string {
-  switch (n.type) {
-    case 'swap_request':
-    case 'swap_targeting_you':
-    case 'swap_decided':
-      return '/swap-requests'
-    case 'leave_request':
-    case 'holiday_request':
-    case 'leave_decided':
-      return '/leaves'
-    case 'planning_updated':
-      return '/schedule'
-    default:
-      return '/schedule'
-  }
+  return getNotificationMessage(
+    n,
+    t as (key: string, params?: Record<string, string>) => string,
+    locale.value,
+  )
 }
 
 function relativeTime(dateStr: string): string {
@@ -162,7 +96,7 @@ async function handleClick(n: AppNotification) {
   if (!n.read_at) {
     await store.markRead(n.id)
   }
-  router.push(getRoute(n))
+  router.push(getNotificationRoute(n.type))
 }
 
 async function handleMarkAllRead() {

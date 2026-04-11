@@ -1,6 +1,9 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { fetchNotifications, markRead as apiMarkRead, markAllRead as apiMarkAllRead } from '@/api/notifications'
+import { addToast } from '@/composables/useToast'
+import { getNotificationMessage } from '@/utils/notificationMessage'
+import i18n from '@/i18n'
 import type { AppNotification } from '@/types'
 
 async function showBrowserNotification(count: number) {
@@ -25,7 +28,7 @@ async function showBrowserNotification(count: number) {
       return
     }
   } catch {
-    // service worker not available, fall through
+    // service worker not available
   }
 
   new Notification(appName, { body, icon: '/icons/icon-192.png' })
@@ -35,7 +38,6 @@ export const useNotificationsStore = defineStore('notifications', () => {
   const notifications = ref<AppNotification[]>([])
   const loading = ref(false)
 
-  // Track which notification IDs we've already seen to detect new arrivals
   const seenIds = new Set<number>()
   let isInitialFetch = true
 
@@ -52,8 +54,16 @@ export const useNotificationsStore = defineStore('notifications', () => {
       notifications.value = res.notifications
 
       if (!isInitialFetch && newUnread.length > 0) {
+        const t = i18n.global.t.bind(i18n.global) as (key: string, params?: Record<string, string>) => string
+        const locale = i18n.global.locale.value
+
+        newUnread.forEach((n) => {
+          addToast(getNotificationMessage(n, t, locale), n.type)
+        })
+
         showBrowserNotification(newUnread.length)
       }
+
       isInitialFetch = false
     } catch {
       // silently ignore — user may not be authenticated yet
