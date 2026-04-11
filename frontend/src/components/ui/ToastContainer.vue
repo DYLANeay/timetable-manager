@@ -6,27 +6,28 @@ const { toasts } = useToasts()
 
 <template>
   <Teleport to="body">
+    <!-- Centred overlay — each toast slides in from slightly above centre -->
     <div
       aria-live="polite"
-      class="pointer-events-none fixed left-1/2 top-4 z-[9999] flex w-full max-w-sm -translate-x-1/2 flex-col gap-2 px-4"
+      class="pointer-events-none fixed inset-x-0 top-1/2 z-[9999] flex -translate-y-1/2 flex-col items-center gap-3 px-4"
     >
       <TransitionGroup
         move-class="transition-all duration-300"
         enter-active-class="transition duration-300 ease-out"
-        enter-from-class="-translate-y-2 opacity-0 scale-95"
+        enter-from-class="-translate-y-3 opacity-0 scale-95"
         enter-to-class="translate-y-0 opacity-100 scale-100"
         leave-active-class="transition duration-200 ease-in"
         leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-95"
+        leave-to-class="opacity-0 scale-90"
       >
         <div
           v-for="toast in toasts"
           :key="toast.id"
-          class="pointer-events-auto flex items-start gap-3 rounded-xl border bg-card px-4 py-3 shadow-lg"
+          class="pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl border bg-card px-4 py-3.5 shadow-xl"
         >
           <!-- Type icon -->
           <div
-            class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+            class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
             :class="
               toast.notificationType === 'planning_updated'
                 ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
@@ -40,7 +41,7 @@ const { toasts } = useToasts()
             <svg
               v-if="toast.notificationType === 'planning_updated'"
               xmlns="http://www.w3.org/2000/svg"
-              class="h-3.5 w-3.5"
+              class="h-4 w-4"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -60,7 +61,7 @@ const { toasts } = useToasts()
                 toast.notificationType === 'leave_decided'
               "
               xmlns="http://www.w3.org/2000/svg"
-              class="h-3.5 w-3.5"
+              class="h-4 w-4"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -73,7 +74,7 @@ const { toasts } = useToasts()
             <svg
               v-else
               xmlns="http://www.w3.org/2000/svg"
-              class="h-3.5 w-3.5"
+              class="h-4 w-4"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -96,7 +97,9 @@ const { toasts } = useToasts()
             class="-mr-1 -mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
             @click="removeToast(toast.id)"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
       </TransitionGroup>
