@@ -1,4 +1,12 @@
 export type Role = 'employee' | 'manager'
+
+export interface AppNotification {
+  id: number
+  type: string
+  data: Record<string, string>
+  read_at: string | null
+  created_at: string
+}
 export type DayType = 'weekday' | 'sunday_holiday'
 export type ShiftTypeName = 'morning' | 'afternoon'
 
