@@ -1,11 +1,17 @@
 <script setup lang="ts">
+import { onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useNotificationsStore } from '@/stores/notifications'
 import { useRouter } from 'vue-router'
 import { setLocale, getLocale } from '@/i18n'
 import { useDarkMode } from '@/composables/useDarkMode'
 import { ref } from 'vue'
+import NotificationBell from '@/components/layout/NotificationBell.vue'
+import NotificationPrompt from '@/components/layout/NotificationPrompt.vue'
+import ToastContainer from '@/components/ui/ToastContainer.vue'
 
 const auth = useAuthStore()
+const notifications = useNotificationsStore()
 const router = useRouter()
 const currentLocale = ref(getLocale())
 const { isDark, toggle: toggleDark } = useDarkMode()
@@ -20,16 +26,50 @@ function toggleLocale() {
   setLocale(next)
   currentLocale.value = next
 }
+
+// ── Notification polling ───────────────────────────────────────────────────
+
+let pollInterval: ReturnType<typeof setInterval> | null = null
+
+function handleVisibilityChange() {
+  if (!document.hidden) {
+    notifications.fetch()
+  }
+}
+
+onMounted(() => {
+  notifications.fetch()
+  pollInterval = setInterval(() => notifications.fetch(), 30_000)
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+})
+
+onUnmounted(() => {
+  if (pollInterval) clearInterval(pollInterval)
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
+})
 </script>
 
 <template>
   <div class="flex h-screen flex-col overflow-hidden bg-background">
-    <div class="flex h-full">
+
+    <!-- Mobile top header (hidden on md+) -->
+    <header class="flex shrink-0 items-center justify-between border-b bg-background px-4 md:hidden" style="height: 56px">
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="text-sm font-semibold tracking-tight">{{ $t('nav.timetable') }}</span>
+      </div>
+      <NotificationBell />
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
       <!-- Desktop sidebar -->
       <aside class="hidden w-56 shrink-0 border-r bg-muted/30 md:flex md:flex-col">
-        <div class="flex h-14 items-center gap-2 border-b px-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <span class="text-sm font-semibold tracking-tight">{{ $t('nav.timetable') }}</span>
+        <div class="flex h-14 items-center justify-between border-b px-4">
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="text-sm font-semibold tracking-tight">{{ $t('nav.timetable') }}</span>
+          </div>
+          <NotificationBell />
         </div>
 
         <nav class="flex-1 space-y-1 p-2">
@@ -132,6 +172,12 @@ function toggleLocale() {
         <slot />
       </main>
     </div>
+
+    <!-- Notification permission prompt -->
+    <NotificationPrompt />
+
+    <!-- In-app toast notifications -->
+    <ToastContainer />
 
     <!-- Mobile bottom nav -->
     <nav class="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden" style="padding-bottom: max(env(safe-area-inset-bottom), 12px)">

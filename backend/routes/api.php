@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AppNotificationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\EmployeeController;
@@ -20,6 +21,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [LoginController::class, 'logout']);
     Route::put('/auth/password', [LoginController::class, 'changePassword']);
     Route::put('/auth/avatar', [LoginController::class, 'updateAvatar']);
+
+    Route::get('/notifications', [AppNotificationController::class, 'index']);
+    Route::put('/notifications/read-all', [AppNotificationController::class, 'readAll']);
+    Route::put('/notifications/{notification}/read', [AppNotificationController::class, 'markRead']);
 
     Route::get('/shift-templates', [ShiftTemplateController::class, 'index']);
 

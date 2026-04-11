@@ -158,17 +158,19 @@ class SwapRequestController extends Controller
 
         if ($validated['approve']) {
             DB::transaction(function () use ($swapRequest, $request) {
-                if ($swapRequest->isGiveaway()) {
-                    $requesterShift = Shift::findOrFail($swapRequest->requester_shift_id);
-                    $requesterShift->update(['user_id' => $swapRequest->target_id]);
-                } else {
-                    $requesterShift = Shift::findOrFail($swapRequest->requester_shift_id);
-                    $targetShift = Shift::findOrFail($swapRequest->target_shift_id);
+                Shift::withoutEvents(function () use ($swapRequest) {
+                    if ($swapRequest->isGiveaway()) {
+                        $requesterShift = Shift::findOrFail($swapRequest->requester_shift_id);
+                        $requesterShift->update(['user_id' => $swapRequest->target_id]);
+                    } else {
+                        $requesterShift = Shift::findOrFail($swapRequest->requester_shift_id);
+                        $targetShift = Shift::findOrFail($swapRequest->target_shift_id);
 
-                    $tempUserId = $requesterShift->user_id;
-                    $requesterShift->update(['user_id' => $targetShift->user_id]);
-                    $targetShift->update(['user_id' => $tempUserId]);
-                }
+                        $tempUserId = $requesterShift->user_id;
+                        $requesterShift->update(['user_id' => $targetShift->user_id]);
+                        $targetShift->update(['user_id' => $tempUserId]);
+                    }
+                });
 
                 $swapRequest->update([
                     'status' => SwapRequestStatus::ManagerApproved,
