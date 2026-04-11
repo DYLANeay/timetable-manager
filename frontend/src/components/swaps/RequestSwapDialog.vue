@@ -46,11 +46,11 @@ onMounted(async () => {
     d.setDate(d.getDate() + i * 7)
     const monday = new Date(d)
     monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7))
-    weeks.push(monday.toISOString().split('T')[0])
+    weeks.push(monday.toISOString().slice(0, 10))
   }
   const unique = [...new Set(weeks)]
   const results = await Promise.all(unique.map((w) => fetchMyShifts(w)))
-  const todayStr = today.toISOString().split('T')[0]
+  const todayStr = today.toISOString().slice(0, 10)
   myShifts.value = results
     .flatMap((r) => r.data)
     .filter((s) => s.date >= todayStr && s.id !== props.targetShift.id)
