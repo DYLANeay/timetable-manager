@@ -29,13 +29,22 @@ function updatePanelPosition() {
   const isMobile = window.innerWidth < 768
   const panelWidth = isMobile ? Math.min(window.innerWidth - 16, 360) : 320
 
-  panelStyle.value = {
+  const style: Record<string, string> = {
     position: 'fixed',
     top: `${rect.bottom + 8}px`,
-    right: `${Math.max(8, window.innerWidth - rect.right)}px`,
     width: `${panelWidth}px`,
     zIndex: '9998',
   }
+
+  // Bell on the left half (desktop sidebar) → anchor panel's left edge to the bell
+  // Bell on the right half (mobile header) → anchor panel's right edge to the bell
+  if (rect.left + rect.width / 2 < window.innerWidth / 2) {
+    style.left = `${Math.max(8, rect.left)}px`
+  } else {
+    style.right = `${Math.max(8, window.innerWidth - rect.right)}px`
+  }
+
+  panelStyle.value = style
 }
 
 function handleOutsideClick(event: MouseEvent) {
