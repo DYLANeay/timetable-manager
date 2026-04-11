@@ -135,6 +135,12 @@ export default {
     title: 'Notifications',
     markAllRead: 'Tout lire',
     noNotifications: 'Aucune notification',
+    prompt: {
+      title: 'Activer les notifications ?',
+      body: "Soyez informé des échanges, congés et mises à jour de votre planning.",
+      enable: 'Activer',
+      dismiss: 'Plus tard',
+    },
     types: {
       swap_request: '{name} a demandé un échange de poste',
       giveaway_request: '{name} a mis un poste en cession',

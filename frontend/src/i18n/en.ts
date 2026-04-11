@@ -135,6 +135,12 @@ export default {
     title: 'Notifications',
     markAllRead: 'Mark all read',
     noNotifications: 'No notifications yet',
+    prompt: {
+      title: 'Enable notifications?',
+      body: 'Get notified about shift swaps, leave requests, and schedule updates.',
+      enable: 'Enable',
+      dismiss: 'Later',
+    },
     types: {
       swap_request: '{name} requested a shift swap',
       giveaway_request: '{name} posted a shift giveaway',
