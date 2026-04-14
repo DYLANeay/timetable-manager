@@ -10,6 +10,7 @@ import RequestSwapDialog from '@/components/swaps/RequestSwapDialog.vue'
 import { fetchSwapRequests, type SwapRequestData } from '@/api/swaps'
 import type { Shift, ShiftTemplate } from '@/types'
 import type { ViewMode } from '@/stores/shifts'
+import { addToast } from '@/composables/useToast'
 
 const auth = useAuthStore()
 const shiftStore = useShiftStore()
@@ -23,6 +24,7 @@ const swapDialogOpen = ref(false)
 const swapTargetShift = ref<Shift | null>(null)
 
 const swapRequests = ref<SwapRequestData[]>([])
+const swapRequestsLoading = ref(false)
 
 const TERMINAL = new Set(['manager_approved', 'manager_denied', 'cancelled'])
 
@@ -37,13 +39,28 @@ const pendingShiftIds = computed(() => {
   return ids
 })
 
+async function loadSwapRequests() {
+  swapRequestsLoading.value = true
+  try {
+    const res = await fetchSwapRequests()
+    swapRequests.value = res.data
+  } catch (err) {
+    console.error('Failed to load swap requests:', err)
+    // Don't block the schedule view for swap request errors
+  } finally {
+    swapRequestsLoading.value = false
+  }
+}
+
 async function loadAll() {
-  await shiftStore.load()
-  const res = await fetchSwapRequests()
-  swapRequests.value = res.data
+  const success = await shiftStore.load()
+  if (success) {
+    await loadSwapRequests()
+  }
 }
 
 onMounted(async () => {
+  // Load templates first (cached), then load data
   await shiftStore.loadTemplates()
   await loadAll()
 })
@@ -104,6 +121,10 @@ function handleSetView(mode: ViewMode) {
   shiftStore.setViewMode(mode)
 }
 
+function handleRetry() {
+  loadAll()
+}
+
 function printSchedule() {
   globalThis.window.print()
 }
@@ -133,6 +154,7 @@ function printSchedule() {
 
     <!-- Timetable -->
     <div class="flex-1 overflow-auto">
+      <!-- Loading state -->
       <div v-if="shiftStore.loading" class="flex h-full items-center justify-center">
         <div class="flex flex-col items-center gap-2">
           <div class="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -140,6 +162,37 @@ function printSchedule() {
         </div>
       </div>
 
+      <!-- Error state with retry -->
+      <div v-else-if="shiftStore.error" class="flex h-full flex-col items-center justify-center gap-4 p-4">
+        <div class="flex flex-col items-center gap-2 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-destructive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p class="text-lg font-medium">{{ $t('schedule.loadError') || 'Impossible de charger le planning' }}</p>
+          <p class="text-sm text-muted-foreground">{{ $t('schedule.checkConnection') || 'Vérifiez votre connexion et réessayez' }}</p>
+        </div>
+        <button
+          class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          @click="handleRetry"
+        >
+          {{ $t('common.retry') || 'Réessayer' }}
+        </button>
+      </div>
+
+      <!-- Empty state - no shifts -->
+      <div v-else-if="shiftStore.shifts.length === 0 && !shiftStore.error" class="flex h-full flex-col items-center justify-center gap-2 p-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-muted-foreground/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <p class="text-sm text-muted-foreground">{{ $t('schedule.noShifts') || 'Aucun shift pour cette période' }}</p>
+      </div>
+
+      <!-- Content -->
       <template v-else>
         <WeeklyTimetable
           v-if="shiftStore.viewMode === 'week'"

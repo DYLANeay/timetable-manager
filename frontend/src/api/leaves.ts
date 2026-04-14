@@ -1,4 +1,5 @@
 import { api } from './client'
+import { invalidateLeavesCache } from '@/utils/cache'
 
 export interface LeaveRequest {
   id: number
@@ -28,22 +29,27 @@ export function fetchLeaveRequests(year?: number, userId?: number) {
   return api<{ data: LeaveRequest[] }>(`/leave-requests${qs ? `?${qs}` : ''}`)
 }
 
-export function createLeaveRequest(data: { start_date: string; end_date: string; note?: string }) {
-  return api<{ data: LeaveRequest }>('/leave-requests', {
+export async function createLeaveRequest(data: { start_date: string; end_date: string; note?: string }) {
+  const result = await api<{ data: LeaveRequest }>('/leave-requests', {
     method: 'POST',
     body: JSON.stringify(data),
   })
+  await invalidateLeavesCache()
+  return result
 }
 
-export function decideLeaveRequest(id: number, status: 'approved' | 'denied') {
-  return api<{ data: LeaveRequest }>(`/leave-requests/${id}/decide`, {
+export async function decideLeaveRequest(id: number, status: 'approved' | 'denied') {
+  const result = await api<{ data: LeaveRequest }>(`/leave-requests/${id}/decide`, {
     method: 'PUT',
     body: JSON.stringify({ status }),
   })
+  await invalidateLeavesCache()
+  return result
 }
 
-export function cancelLeaveRequest(id: number) {
-  return api<void>(`/leave-requests/${id}`, { method: 'DELETE' })
+export async function cancelLeaveRequest(id: number) {
+  await api<void>(`/leave-requests/${id}`, { method: 'DELETE' })
+  await invalidateLeavesCache()
 }
 
 export function fetchLeaveBalance(year?: number, userId?: number) {

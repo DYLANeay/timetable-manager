@@ -11,6 +11,7 @@ export default {
     back: 'Retour',
     today: "Aujourd'hui",
     language: 'Langue',
+    retry: 'Réessayer',
   },
   auth: {
     signIn: 'Se connecter',
@@ -52,6 +53,9 @@ export default {
     saving: 'Enregistrement...',
     unassigned: 'Non assigné',
     print: 'Imprimer',
+    loadError: 'Impossible de charger le planning',
+    checkConnection: 'Vérifiez votre connexion et réessayez',
+    noShifts: 'Aucun shift pour cette période',
   },
   swaps: {
     title: "Demandes d'échange",

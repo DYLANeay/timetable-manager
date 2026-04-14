@@ -9,6 +9,7 @@ import { ref } from 'vue'
 import NotificationBell from '@/components/layout/NotificationBell.vue'
 import NotificationPrompt from '@/components/layout/NotificationPrompt.vue'
 import ToastContainer from '@/components/ui/ToastContainer.vue'
+import OfflineIndicator from '@/components/ui/OfflineIndicator.vue'
 
 const auth = useAuthStore()
 const notifications = useNotificationsStore()
@@ -178,6 +179,9 @@ onUnmounted(() => {
 
     <!-- In-app toast notifications -->
     <ToastContainer />
+
+    <!-- Offline indicator -->
+    <OfflineIndicator />
 
     <!-- Mobile bottom nav -->
     <nav class="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden" style="padding-bottom: max(env(safe-area-inset-bottom), 12px)">

@@ -11,6 +11,7 @@ export default {
     back: 'Back',
     today: 'Today',
     language: 'Language',
+    retry: 'Retry',
   },
   auth: {
     signIn: 'Sign in',
@@ -52,6 +53,9 @@ export default {
     saving: 'Saving...',
     unassigned: 'Unassigned',
     print: 'Print',
+    loadError: 'Failed to load schedule',
+    checkConnection: 'Check your connection and try again',
+    noShifts: 'No shifts for this period',
   },
   swaps: {
     title: 'Swap Requests',

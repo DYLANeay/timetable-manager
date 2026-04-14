@@ -86,11 +86,13 @@ describe('login', () => {
     expect(store.isAuthenticated).toBe(true)
   })
 
-  it('propagates API errors to caller', async () => {
+  it('returns error on failed login', async () => {
     vi.mocked(authApi.login).mockRejectedValue(new Error('Invalid credentials'))
 
     const store = useAuthStore()
-    await expect(store.login('x', 'y')).rejects.toThrow('Invalid credentials')
+    const result = await store.login('x', 'y')
+    expect(result.success).toBe(false)
+    expect(result.error).toBeDefined()
   })
 })
 

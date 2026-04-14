@@ -4,6 +4,7 @@ import type { Shift, ShiftTemplate } from '@/types'
 import * as shiftsApi from '@/api/shifts'
 import { fetchHolidays, type PublicHoliday } from '@/api/holidays'
 import { fetchLeaveRequests, type LeaveRequest } from '@/api/leaves'
+import { addToast } from '@/composables/useToast'
 
 export type ViewMode = 'week' | 'month'
 
@@ -43,6 +44,7 @@ export const useShiftStore = defineStore('shifts', () => {
   const currentMonth = ref(toLocalMonth(new Date()))
   const viewMode = ref<ViewMode>('week')
   const loading = ref(false)
+  const error = ref<string | null>(null)
 
   const weekDays = computed(() => {
     const start = parseLocalDate(currentWeek.value)
@@ -96,18 +98,31 @@ export const useShiftStore = defineStore('shifts', () => {
     return shifts.value.filter((s) => s.date === date)
   }
 
-  async function loadTemplates() {
-    if (templates.value.length > 0) return
-    const response = await shiftsApi.fetchShiftTemplates()
-    templates.value = response.data
+  async function loadTemplates(): Promise<boolean> {
+    if (templates.value.length > 0) return true
+    try {
+      const response = await shiftsApi.fetchShiftTemplates()
+      templates.value = response.data
+      return true
+    } catch (err) {
+      console.error('Failed to load templates:', err)
+      addToast('Impossible de charger les modèles de shift', 'error')
+      return false
+    }
   }
 
-  async function loadLeaves() {
-    const year = viewMode.value === 'month'
-      ? Number(currentMonth.value.slice(0, 4))
-      : parseLocalDate(currentWeek.value).getFullYear()
-    const res = await fetchLeaveRequests(year)
-    leaveRequests.value = res.data
+  async function loadLeaves(): Promise<boolean> {
+    try {
+      const year = viewMode.value === 'month'
+        ? Number(currentMonth.value.slice(0, 4))
+        : parseLocalDate(currentWeek.value).getFullYear()
+      const res = await fetchLeaveRequests(year)
+      leaveRequests.value = res.data
+      return true
+    } catch (err) {
+      console.error('Failed to load leaves:', err)
+      return false
+    }
   }
 
   function getLeavesForDate(date: string): LeaveRequest[] {
@@ -116,16 +131,23 @@ export const useShiftStore = defineStore('shifts', () => {
     )
   }
 
-  async function loadHolidays() {
-    const year = viewMode.value === 'month'
-      ? Number(currentMonth.value.slice(0, 4))
-      : parseLocalDate(currentWeek.value).getFullYear()
-    const res = await fetchHolidays(year)
-    holidays.value = res.data
+  async function loadHolidays(): Promise<boolean> {
+    try {
+      const year = viewMode.value === 'month'
+        ? Number(currentMonth.value.slice(0, 4))
+        : parseLocalDate(currentWeek.value).getFullYear()
+      const res = await fetchHolidays(year)
+      holidays.value = res.data
+      return true
+    } catch (err) {
+      console.error('Failed to load holidays:', err)
+      return false
+    }
   }
 
-  async function loadShifts() {
+  async function loadShifts(): Promise<boolean> {
     loading.value = true
+    error.value = null
     try {
       if (viewMode.value === 'month') {
         const response = await shiftsApi.fetchShiftsByMonth(currentMonth.value)
@@ -134,13 +156,19 @@ export const useShiftStore = defineStore('shifts', () => {
         const response = await shiftsApi.fetchShifts(currentWeek.value)
         shifts.value = response.data
       }
+      return true
+    } catch (err) {
+      error.value = 'Impossible de charger les shifts'
+      addToast(error.value, 'error')
+      return false
     } finally {
       loading.value = false
     }
   }
 
-  async function load() {
-    await Promise.all([loadShifts(), loadHolidays(), loadLeaves()])
+  async function load(): Promise<boolean> {
+    const results = await Promise.all([loadShifts(), loadHolidays(), loadLeaves()])
+    return results.every(r => r)
   }
 
   function previousWeek() {
@@ -177,7 +205,7 @@ export const useShiftStore = defineStore('shifts', () => {
   }
 
   return {
-    shifts, templates, holidays, leaveRequests, currentWeek, currentMonth, viewMode, loading,
+    shifts, templates, holidays, leaveRequests, currentWeek, currentMonth, viewMode, loading, error,
     weekDays, monthDays, holidayDates, isHoliday, getHoliday, getLeavesForDate,
     getShiftsForDateAndTemplate, getShiftsForDate,
     loadTemplates, loadHolidays, loadLeaves, loadShifts, load,
