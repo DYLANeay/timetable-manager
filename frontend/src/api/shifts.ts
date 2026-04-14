@@ -1,5 +1,6 @@
 import type { Shift, ShiftTemplate } from '@/types'
 import { api } from './client'
+import { invalidateShiftsCache } from '@/utils/cache'
 
 interface ApiCollection<T> {
   data: T[]
@@ -21,33 +22,38 @@ export function fetchShiftTemplates(): Promise<ApiCollection<ShiftTemplate>> {
   return api<ApiCollection<ShiftTemplate>>('/shift-templates')
 }
 
-export function createShift(data: {
+export async function createShift(data: {
   user_id: number | null
   shift_template_id: number
   date: string
   notes?: string
 }): Promise<{ data: Shift }> {
-  return api('/shifts', {
+  const result = await api<{ data: Shift }>('/shifts', {
     method: 'POST',
     body: JSON.stringify(data),
   })
+  await invalidateShiftsCache()
+  return result
 }
 
-export function updateShift(
+export async function updateShift(
   id: number,
   data: { user_id?: number | null; notes?: string | null },
 ): Promise<{ data: Shift }> {
-  return api(`/shifts/${id}`, {
+  const result = await api<{ data: Shift }>(`/shifts/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),
   })
+  await invalidateShiftsCache()
+  return result
 }
 
-export function deleteShift(id: number): Promise<void> {
-  return api(`/shifts/${id}`, { method: 'DELETE' })
+export async function deleteShift(id: number): Promise<void> {
+  await api<void>(`/shifts/${id}`, { method: 'DELETE' })
+  await invalidateShiftsCache()
 }
 
-export function bulkCreateShifts(
+export async function bulkCreateShifts(
   shifts: Array<{
     user_id: number | null
     shift_template_id: number
@@ -55,8 +61,10 @@ export function bulkCreateShifts(
     notes?: string
   }>,
 ): Promise<ApiCollection<Shift>> {
-  return api('/shifts/bulk', {
+  const result = await api<ApiCollection<Shift>>('/shifts/bulk', {
     method: 'POST',
     body: JSON.stringify({ shifts }),
   })
+  await invalidateShiftsCache()
+  return result
 }

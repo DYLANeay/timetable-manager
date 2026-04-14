@@ -1,4 +1,5 @@
 import { api } from './client'
+import { invalidateSwapsCache, invalidateShiftsCache } from '@/utils/cache'
 
 export interface SwapRequestData {
   id: number
@@ -31,53 +32,71 @@ export function fetchSwapRequests(): Promise<ApiCollection<SwapRequestData>> {
   return api<ApiCollection<SwapRequestData>>('/swap-requests')
 }
 
-export function createSwapRequest(data: {
+export async function createSwapRequest(data: {
   requester_shift_id: number
   target_shift_id: number
   note?: string
 }): Promise<{ data: SwapRequestData }> {
-  return api('/swap-requests', {
+  const result = await api<{ data: SwapRequestData }>('/swap-requests', {
     method: 'POST',
     body: JSON.stringify(data),
   })
+  await invalidateSwapsCache()
+  await invalidateShiftsCache()
+  return result
 }
 
-export function createGiveaway(data: {
+export async function createGiveaway(data: {
   requester_shift_id: number
   note?: string
 }): Promise<{ data: SwapRequestData }> {
-  return api('/swap-requests', {
+  const result = await api<{ data: SwapRequestData }>('/swap-requests', {
     method: 'POST',
     body: JSON.stringify({ ...data, type: 'giveaway' }),
   })
+  await invalidateSwapsCache()
+  await invalidateShiftsCache()
+  return result
 }
 
-export function claimGiveaway(id: number): Promise<{ data: SwapRequestData }> {
-  return api(`/swap-requests/${id}/claim`, { method: 'PUT' })
+export async function claimGiveaway(id: number): Promise<{ data: SwapRequestData }> {
+  const result = await api<{ data: SwapRequestData }>(`/swap-requests/${id}/claim`, { method: 'PUT' })
+  await invalidateSwapsCache()
+  await invalidateShiftsCache()
+  return result
 }
 
-export function respondToSwapRequest(
+export async function respondToSwapRequest(
   id: number,
   accept: boolean,
 ): Promise<{ data: SwapRequestData }> {
-  return api(`/swap-requests/${id}/respond`, {
+  const result = await api<{ data: SwapRequestData }>(`/swap-requests/${id}/respond`, {
     method: 'PUT',
     body: JSON.stringify({ accept }),
   })
+  await invalidateSwapsCache()
+  await invalidateShiftsCache()
+  return result
 }
 
-export function decideSwapRequest(
+export async function decideSwapRequest(
   id: number,
   approve: boolean,
 ): Promise<{ data: SwapRequestData }> {
-  return api(`/swap-requests/${id}/decide`, {
+  const result = await api<{ data: SwapRequestData }>(`/swap-requests/${id}/decide`, {
     method: 'PUT',
     body: JSON.stringify({ approve }),
   })
+  await invalidateSwapsCache()
+  await invalidateShiftsCache()
+  return result
 }
 
-export function cancelSwapRequest(id: number): Promise<{ data: SwapRequestData }> {
-  return api(`/swap-requests/${id}/cancel`, {
+export async function cancelSwapRequest(id: number): Promise<{ data: SwapRequestData }> {
+  const result = await api<{ data: SwapRequestData }>(`/swap-requests/${id}/cancel`, {
     method: 'PUT',
   })
+  await invalidateSwapsCache()
+  await invalidateShiftsCache()
+  return result
 }

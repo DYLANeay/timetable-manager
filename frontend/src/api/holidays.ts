@@ -1,4 +1,5 @@
 import { api } from './client'
+import { invalidateApiCaches } from '@/utils/cache'
 
 export interface PublicHoliday {
   id: number
@@ -14,13 +15,18 @@ export function fetchHolidays(year: number): Promise<ApiCollection<PublicHoliday
   return api<ApiCollection<PublicHoliday>>(`/public-holidays?year=${year}`)
 }
 
-export function createHoliday(data: { date: string; name: string }): Promise<{ data: PublicHoliday }> {
-  return api('/public-holidays', {
+export async function createHoliday(data: { date: string; name: string }): Promise<{ data: PublicHoliday }> {
+  const result = await api<{ data: PublicHoliday }>('/public-holidays', {
     method: 'POST',
     body: JSON.stringify(data),
   })
+  // Holidays affect shift templates, so invalidate all
+  await invalidateApiCaches()
+  return result
 }
 
-export function deleteHoliday(id: number): Promise<void> {
-  return api(`/public-holidays/${id}`, { method: 'DELETE' })
+export async function deleteHoliday(id: number): Promise<void> {
+  await api<void>(`/public-holidays/${id}`, { method: 'DELETE' })
+  // Holidays affect shift templates, so invalidate all
+  await invalidateApiCaches()
 }

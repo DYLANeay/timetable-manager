@@ -51,12 +51,13 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
         runtimeCaching: [
           {
+            // Shifts: StaleWhileRevalidate for instant display + background update
+            // Cache is invalidated programmatically when manager makes changes
             urlPattern: ({ url }) => url.pathname.startsWith('/api/shifts'),
-            handler: 'NetworkFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'shifts-cache',
-              expiration: { maxEntries: 50, maxAgeSeconds: 86400 }, // 24 hours
-              networkTimeoutSeconds: 10,
+              expiration: { maxEntries: 100 }, // No time limit, invalidated on changes
               backgroundSync: {
                 name: 'shifts-sync',
                 options: {
@@ -66,36 +67,40 @@ export default defineConfig({
             },
           },
           {
+            // Shift templates: CacheFirst but with short expiration (rarely change)
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/shift-templates'),
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'templates-cache',
+              expiration: { maxEntries: 10 },
+            },
+          },
+          {
+            // Swap requests: NetworkFirst (time-sensitive)
             urlPattern: ({ url }) => url.pathname.startsWith('/api/swap-requests'),
             handler: 'NetworkFirst',
             options: {
               cacheName: 'swaps-cache',
-              expiration: { maxEntries: 20, maxAgeSeconds: 3600 }, // 1 hour
+              expiration: { maxEntries: 50, maxAgeSeconds: 300 }, // 5 minutes
               networkTimeoutSeconds: 10,
             },
           },
           {
-            urlPattern: ({ url }) => url.pathname.startsWith('/api/shift-templates'),
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'templates-cache',
-              expiration: { maxEntries: 5, maxAgeSeconds: 604800 }, // 7 days
-            },
-          },
-          {
+            // Holidays: CacheFirst (changes yearly)
             urlPattern: ({ url }) => url.pathname.startsWith('/api/holidays'),
             handler: 'CacheFirst',
             options: {
               cacheName: 'holidays-cache',
-              expiration: { maxEntries: 10, maxAgeSeconds: 604800 }, // 7 days
+              expiration: { maxEntries: 10, maxAgeSeconds: 86400 }, // 24 hours
             },
           },
           {
+            // Leave requests: NetworkFirst (frequently changes)
             urlPattern: ({ url }) => url.pathname.startsWith('/api/leave-requests'),
             handler: 'NetworkFirst',
             options: {
               cacheName: 'leaves-cache',
-              expiration: { maxEntries: 20, maxAgeSeconds: 3600 }, // 1 hour
+              expiration: { maxEntries: 50, maxAgeSeconds: 300 }, // 5 minutes
               networkTimeoutSeconds: 10,
             },
           },
