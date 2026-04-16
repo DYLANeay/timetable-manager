@@ -94,10 +94,6 @@ export const useShiftStore = defineStore('shifts', () => {
     )
   }
 
-  function getShiftsForDate(date: string): Shift[] {
-    return shifts.value.filter((s) => s.date === date)
-  }
-
   async function loadTemplates(): Promise<boolean> {
     if (templates.value.length > 0) return true
     try {
@@ -207,7 +203,7 @@ export const useShiftStore = defineStore('shifts', () => {
   return {
     shifts, templates, holidays, leaveRequests, currentWeek, currentMonth, viewMode, loading, error,
     weekDays, monthDays, holidayDates, isHoliday, getHoliday, getLeavesForDate,
-    getShiftsForDateAndTemplate, getShiftsForDate,
+    getShiftsForDateAndTemplate,
     loadTemplates, loadHolidays, loadLeaves, loadShifts, load,
     previousWeek, nextWeek, previousMonth, nextMonth, setViewMode,
   }

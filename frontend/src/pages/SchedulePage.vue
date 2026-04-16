@@ -10,8 +10,6 @@ import RequestSwapDialog from '@/components/swaps/RequestSwapDialog.vue'
 import { fetchSwapRequests, type SwapRequestData } from '@/api/swaps'
 import type { Shift, ShiftTemplate } from '@/types'
 import type { ViewMode } from '@/stores/shifts'
-import { addToast } from '@/composables/useToast'
-
 const auth = useAuthStore()
 const shiftStore = useShiftStore()
 
@@ -24,7 +22,6 @@ const swapDialogOpen = ref(false)
 const swapTargetShift = ref<Shift | null>(null)
 
 const swapRequests = ref<SwapRequestData[]>([])
-const swapRequestsLoading = ref(false)
 
 const TERMINAL = new Set(['manager_approved', 'manager_denied', 'cancelled'])
 
@@ -40,15 +37,11 @@ const pendingShiftIds = computed(() => {
 })
 
 async function loadSwapRequests() {
-  swapRequestsLoading.value = true
   try {
     const res = await fetchSwapRequests()
     swapRequests.value = res.data
   } catch (err) {
     console.error('Failed to load swap requests:', err)
-    // Don't block the schedule view for swap request errors
-  } finally {
-    swapRequestsLoading.value = false
   }
 }
 

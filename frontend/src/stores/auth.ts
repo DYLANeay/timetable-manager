@@ -3,7 +3,6 @@ import { defineStore } from 'pinia'
 import { useRouter } from 'vue-router'
 import type { User } from '@/types'
 import * as authApi from '@/api/auth'
-import { addToast } from '@/composables/useToast'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
