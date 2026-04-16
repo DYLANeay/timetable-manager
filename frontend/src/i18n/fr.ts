@@ -55,7 +55,6 @@ export default {
     print: 'Imprimer',
     loadError: 'Impossible de charger le planning',
     checkConnection: 'Vérifiez votre connexion et réessayez',
-    noShifts: 'Aucun shift pour cette période',
   },
   swaps: {
     title: "Demandes d'échange",

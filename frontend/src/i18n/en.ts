@@ -55,7 +55,6 @@ export default {
     print: 'Print',
     loadError: 'Failed to load schedule',
     checkConnection: 'Check your connection and try again',
-    noShifts: 'No shifts for this period',
   },
   swaps: {
     title: 'Swap Requests',
