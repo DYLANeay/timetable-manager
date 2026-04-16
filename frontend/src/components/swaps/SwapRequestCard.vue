@@ -142,14 +142,32 @@ const statusKey = computed(() => `swaps.status.${props.request.status}`)
         <span class="text-muted-foreground">{{ request.requester.name }}:</span>
         <p class="font-medium">{{ formatShift(request.requester_shift) }}</p>
       </div>
-      <div v-else class="grid grid-cols-2 gap-2">
+      <div v-else-if="request.target_shift" class="space-y-2">
         <div>
-          <span class="text-muted-foreground">{{ request.requester.name }}:</span>
-          <p class="font-medium">{{ formatShift(request.requester_shift) }}</p>
+          <span class="text-xs font-medium text-muted-foreground uppercase">{{ t('swaps.before') }}</span>
+          <div class="mt-1 grid grid-cols-2 gap-2">
+            <div>
+              <span class="text-muted-foreground">{{ request.requester.name }}:</span>
+              <p class="font-medium">{{ formatShift(request.requester_shift) }}</p>
+            </div>
+            <div>
+              <span class="text-muted-foreground">{{ request.target?.name }}:</span>
+              <p class="font-medium">{{ formatShift(request.target_shift) }}</p>
+            </div>
+          </div>
         </div>
-        <div v-if="request.target_shift">
-          <span class="text-muted-foreground">{{ request.target?.name }}:</span>
-          <p class="font-medium">{{ formatShift(request.target_shift) }}</p>
+        <div class="border-t pt-2">
+          <span class="text-xs font-medium text-muted-foreground uppercase">{{ t('swaps.after') }}</span>
+          <div class="mt-1 grid grid-cols-2 gap-2">
+            <div>
+              <span class="text-muted-foreground">{{ request.requester.name }}:</span>
+              <p class="font-medium">{{ formatShift(request.target_shift) }}</p>
+            </div>
+            <div>
+              <span class="text-muted-foreground">{{ request.target?.name }}:</span>
+              <p class="font-medium">{{ formatShift(request.requester_shift) }}</p>
+            </div>
+          </div>
         </div>
       </div>
 

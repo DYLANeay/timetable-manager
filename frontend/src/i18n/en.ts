@@ -78,6 +78,8 @@ export default {
     giveAwayDescription: 'Select one of your upcoming shifts to give away.',
     givingAway: 'Giving away',
     selectShift: 'Select a shift',
+    before: 'Before',
+    after: 'After',
     status: {
       open: 'Open',
       pending_peer: 'Pending',

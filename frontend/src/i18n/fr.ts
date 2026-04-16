@@ -78,6 +78,8 @@ export default {
     giveAwayDescription: 'Sélectionnez un de vos prochains postes à céder.',
     givingAway: 'Cession',
     selectShift: 'Sélectionner un poste',
+    before: 'Avant',
+    after: 'Après',
     status: {
       open: 'Ouvert',
       pending_peer: 'En attente',
