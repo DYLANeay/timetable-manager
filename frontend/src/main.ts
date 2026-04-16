@@ -13,30 +13,18 @@ const app = createApp(App)
 // Global error handler for Vue errors
 app.config.errorHandler = (err, instance, info) => {
   console.error('Vue Error:', err, info)
-  addToast('Une erreur inattendue est survenue. La page va se recharger.', 'error')
-  // Auto-reload after 3 seconds for critical errors
-  setTimeout(() => {
-    window.location.reload()
-  }, 3000)
+  addToast('Une erreur inattendue est survenue.', 'error')
 }
 
-// Handle unhandled promise rejections
-window.addEventListener('unhandledrejection', (event) => {
-  console.error('Unhandled Promise Rejection:', event.reason)
-  addToast('Une erreur réseau est survenue. Veuillez vérifier votre connexion.', 'error')
-})
-
-// Handle global errors
+// Handle global errors - prevent white screen during initial load
 window.addEventListener('error', (event) => {
   console.error('Global Error:', event.error)
-  // Prevent white screen - show splash if app fails to mount
   const splash = document.getElementById('splash')
   if (splash && !splash.classList.contains('hidden')) {
     const title = splash.querySelector('#splash-title')
     if (title) {
-      title.textContent = 'Erreur de chargement. Rafraîchissement...'
+      title.textContent = 'Erreur de chargement. Veuillez rafraîchir la page.'
     }
-    setTimeout(() => window.location.reload(), 3000)
   }
 })
 

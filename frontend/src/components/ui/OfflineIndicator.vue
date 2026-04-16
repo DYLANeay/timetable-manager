@@ -1,24 +1,18 @@
 <script setup lang="ts">
 import { useOffline } from '@/composables/useOffline'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 
 const { isOffline, wasOffline } = useOffline()
 
 const showReconnect = computed(() => !isOffline.value && wasOffline.value)
+const showBanner = computed(() => isOffline.value || showReconnect.value)
 
-let reconnectTimer: ReturnType<typeof setTimeout> | null = null
-const showBanner = computed(() => {
-  if (showReconnect.value) {
-    // Auto-hide reconnect banner after 3 seconds
-    if (!reconnectTimer) {
-      reconnectTimer = setTimeout(() => {
-        wasOffline.value = false
-      }, 3000)
-    }
-    return true
+watch(showReconnect, (reconnected) => {
+  if (reconnected) {
+    setTimeout(() => {
+      wasOffline.value = false
+    }, 3000)
   }
-  reconnectTimer = null
-  return isOffline.value
 })
 </script>
 

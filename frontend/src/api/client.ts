@@ -1,4 +1,3 @@
-import { addToast } from '@/composables/useToast'
 import { getOfflineStatus } from '@/composables/useOffline'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
@@ -107,21 +106,3 @@ export async function api<T>(
   }
 }
 
-// Wrapper for common operations with error toast
-export async function apiWithToast<T>(
-  path: string,
-  options: RequestInit = {},
-  errorMessage = 'Une erreur est survenue'
-): Promise<T | null> {
-  try {
-    return await api<T>(path, options)
-  } catch (error) {
-    if (error instanceof ApiError) {
-      const message = (error.data.message as string) || errorMessage
-      addToast(message, 'error')
-    } else {
-      addToast(errorMessage, 'error')
-    }
-    return null
-  }
-}

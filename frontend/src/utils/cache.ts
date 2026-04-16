@@ -1,8 +1,6 @@
 // Cache invalidation utilities for manager actions
 // These are called after CRUD operations to ensure fresh data
 
-declare const caches: CacheStorage
-
 const API_CACHE_NAMES = [
   'shifts-cache',
   'swaps-cache',

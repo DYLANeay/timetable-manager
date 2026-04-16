@@ -41,8 +41,7 @@ export async function createSwapRequest(data: {
     method: 'POST',
     body: JSON.stringify(data),
   })
-  await invalidateSwapsCache()
-  await invalidateShiftsCache()
+  await Promise.all([invalidateSwapsCache(), invalidateShiftsCache()])
   return result
 }
 
@@ -54,15 +53,13 @@ export async function createGiveaway(data: {
     method: 'POST',
     body: JSON.stringify({ ...data, type: 'giveaway' }),
   })
-  await invalidateSwapsCache()
-  await invalidateShiftsCache()
+  await Promise.all([invalidateSwapsCache(), invalidateShiftsCache()])
   return result
 }
 
 export async function claimGiveaway(id: number): Promise<{ data: SwapRequestData }> {
   const result = await api<{ data: SwapRequestData }>(`/swap-requests/${id}/claim`, { method: 'PUT' })
-  await invalidateSwapsCache()
-  await invalidateShiftsCache()
+  await Promise.all([invalidateSwapsCache(), invalidateShiftsCache()])
   return result
 }
 
@@ -74,8 +71,7 @@ export async function respondToSwapRequest(
     method: 'PUT',
     body: JSON.stringify({ accept }),
   })
-  await invalidateSwapsCache()
-  await invalidateShiftsCache()
+  await Promise.all([invalidateSwapsCache(), invalidateShiftsCache()])
   return result
 }
 
@@ -87,8 +83,7 @@ export async function decideSwapRequest(
     method: 'PUT',
     body: JSON.stringify({ approve }),
   })
-  await invalidateSwapsCache()
-  await invalidateShiftsCache()
+  await Promise.all([invalidateSwapsCache(), invalidateShiftsCache()])
   return result
 }
 
@@ -96,7 +91,6 @@ export async function cancelSwapRequest(id: number): Promise<{ data: SwapRequest
   const result = await api<{ data: SwapRequestData }>(`/swap-requests/${id}/cancel`, {
     method: 'PUT',
   })
-  await invalidateSwapsCache()
-  await invalidateShiftsCache()
+  await Promise.all([invalidateSwapsCache(), invalidateShiftsCache()])
   return result
 }
