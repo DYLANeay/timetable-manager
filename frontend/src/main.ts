@@ -28,11 +28,21 @@ window.addEventListener('error', (event) => {
   }
 })
 
-app.use(createPinia())
+const pinia = createPinia()
+app.use(pinia)
 app.use(router)
 app.use(i18n)
 
-// Mount the app
+// Pre-fetch user before mounting so isAuthenticated is stable on first render.
+// Without this, App.vue starts with v-else (no AppShell), then flips to v-if
+// when fetchUser resolves — destroying and recreating <RouterView>, which can
+// break navigation until the next hard refresh.
+const { useAuthStore } = await import('./stores/auth')
+const auth = useAuthStore(pinia)
+if (auth.token) {
+  await auth.fetchUser()
+}
+
 app.mount('#app')
 
 // Hide splash screen when router is ready
